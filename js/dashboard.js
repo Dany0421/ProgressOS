@@ -14,10 +14,7 @@ function openSettings() {
   const logoutBtn = document.createElement('button');
   logoutBtn.className = 'btn-danger-outline';
   logoutBtn.textContent = 'Log out';
-  logoutBtn.addEventListener('click', async () => {
-    const confirmed = confirm('Log out?');
-    if (confirmed) await logout();
-  });
+  logoutBtn.addEventListener('click', () => logout());
 
   content.appendChild(logoutBtn);
   showBottomSheet(content, 'Settings');

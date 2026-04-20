@@ -957,6 +957,86 @@
 .notes-area:focus { border-color: var(--border-active); }
 .notes-area::placeholder { color: var(--text-muted); }
 
+/* ---- Task options (long press) ---- */
+.sheet-option-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 8px;
+}
+
+.btn-outline {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-inner);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 14px;
+  min-height: 52px;
+  margin-top: 8px;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.btn-outline:active { background: var(--bg-subtle); }
+
+/* ---- Onboarding card ---- */
+.onboarding-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 28px 24px 24px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.onboarding-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  line-height: 1.1;
+}
+
+.onboarding-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.onboarding-pillar {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 2px;
+}
+.onboarding-pillar svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent-primary);
+  grid-row: 1 / 3;
+  margin-top: 2px;
+}
+.onboarding-pillar-heading {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.onboarding-pillar-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
 /* ---- Complete project ---- */
 .complete-project-wrap { padding-top: 4px; }
 .btn-complete-project {

@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     _renderFocus();
     _renderFeed();
     _wireFAB();
+    _checkOnboarding();
   } catch (err) {
     if (DEBUG) console.error('dashboard init', err);
     toast('Could not load dashboard', 'error');
@@ -34,7 +35,7 @@ async function _loadAll() {
   const thirtyDaysAgo = _daysAgo(29);
 
   const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes] = await Promise.all([
-    supabase.from('profiles').select('username, total_xp, current_level, created_at').eq('id', _userId).single(),
+    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed').eq('id', _userId).single(),
     supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('completed', true).eq('due_date', today),
     supabase.from('habits').select('*', { count: 'exact', head: true }).eq('user_id', _userId).gt('current_streak', 0),
     supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('status', 'active'),
@@ -527,6 +528,80 @@ function _buildStatRow(label, value) {
   row.appendChild(val);
 
   return row;
+}
+
+// ---- Onboarding ----
+
+function _checkOnboarding() {
+  if (_profile.onboarding_completed === false) {
+    _showOnboardingModal();
+  }
+}
+
+function _showOnboardingModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'onboarding-overlay';
+
+  const card = document.createElement('div');
+  card.className = 'onboarding-card';
+
+  const title = document.createElement('h1');
+  title.className = 'onboarding-title';
+  title.textContent = `Welcome, ${_profile.username || 'Player'}.`;
+  card.appendChild(title);
+
+  const pillars = document.createElement('div');
+  pillars.className = 'onboarding-pillars';
+
+  const pillarData = [
+    { icon: 'check-square', heading: 'Tasks', body: 'Complete daily tasks, earn XP, and chain bonuses for clearing your list.' },
+    { icon: 'repeat',       heading: 'Habits', body: 'Build streaks. Reach milestones. Freeze your streak so life doesn\'t break it.' },
+    { icon: 'folder-open',  heading: 'Projects', body: 'Log deep work sessions. Earn XP for every 30 minutes of focus.' }
+  ];
+
+  pillarData.forEach(({ icon, heading, body }) => {
+    const pillar = document.createElement('div');
+    pillar.className = 'onboarding-pillar';
+
+    const iconEl = document.createElement('i');
+    iconEl.setAttribute('data-lucide', icon);
+    pillar.appendChild(iconEl);
+
+    const h = document.createElement('p');
+    h.className = 'onboarding-pillar-heading';
+    h.textContent = heading;
+    pillar.appendChild(h);
+
+    const p = document.createElement('p');
+    p.className = 'onboarding-pillar-body';
+    p.textContent = body;
+    pillar.appendChild(p);
+
+    pillars.appendChild(pillar);
+  });
+
+  card.appendChild(pillars);
+
+  const btn = document.createElement('button');
+  btn.className = 'btn-primary';
+  btn.textContent = "Let's go.";
+  btn.addEventListener('click', async () => {
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 400);
+    haptic(15);
+    try {
+      await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', _userId);
+    } catch (err) {
+      if (DEBUG) console.error('onboarding update failed', err);
+    }
+  });
+  card.appendChild(btn);
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  lucide.createIcons();
+
+  requestAnimationFrame(() => setTimeout(() => overlay.classList.add('onboarding-overlay--visible'), 30));
 }
 
 // ---- FAB — quick add task ----

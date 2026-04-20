@@ -148,6 +148,13 @@ function _createTaskCard(task) {
   card.className = 'task-card' + (task.completed ? ' task-card--done' : '');
   card.dataset.taskId = task.id;
 
+  let pressTimer = null;
+  card.addEventListener('touchstart', () => {
+    pressTimer = setTimeout(() => { haptic([10, 20]); _openTaskOptions(task); }, 500);
+  }, { passive: true });
+  card.addEventListener('touchend', () => clearTimeout(pressTimer));
+  card.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
   const check = document.createElement('button');
   check.className = 'task-check' + (task.completed ? ' task-check--done' : '');
   check.setAttribute('aria-label', task.completed ? 'Completed' : 'Mark complete');
@@ -259,6 +266,73 @@ async function _checkAllDoneBonus() {
     toast('All tasks done — +50 XP bonus');
     _todayXP = Math.min(250, _todayXP + 50);
     _renderXPPill();
+  }
+}
+
+function _openTaskOptions(task) {
+  const today = todayLocal();
+  const isCarried = !task.completed && task.due_date < today;
+
+  const content = document.createElement('div');
+  content.className = 'settings-content';
+
+  const nameEl = document.createElement('p');
+  nameEl.className = 'sheet-option-label';
+  nameEl.textContent = task.title;
+  content.appendChild(nameEl);
+
+  if (isCarried) {
+    const rescheduleBtn = document.createElement('button');
+    rescheduleBtn.className = 'btn-outline';
+    rescheduleBtn.textContent = 'Move to today';
+    rescheduleBtn.addEventListener('click', async () => {
+      await _rescheduleTask(task);
+      hideBottomSheet();
+    });
+    content.appendChild(rescheduleBtn);
+  }
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'btn-danger-outline';
+  deleteBtn.textContent = 'Delete task';
+  deleteBtn.addEventListener('click', async () => {
+    await _deleteTask(task);
+    hideBottomSheet();
+  });
+  content.appendChild(deleteBtn);
+
+  showBottomSheet(content, 'Task options');
+}
+
+async function _rescheduleTask(task) {
+  try {
+    const { error } = await supabase.from('tasks')
+      .update({ due_date: todayLocal() })
+      .eq('id', task.id);
+    if (error) throw error;
+    task.due_date = todayLocal();
+    await _loadTasks();
+    _renderFilterBar();
+    _renderTasks();
+    haptic(15);
+    toast('Moved to today');
+  } catch (err) {
+    if (DEBUG) console.error('rescheduleTask failed', err);
+    toast('Could not reschedule task', 'error');
+  }
+}
+
+async function _deleteTask(task) {
+  try {
+    const { error } = await supabase.from('tasks').delete().eq('id', task.id);
+    if (error) throw error;
+    _tasks = _tasks.filter(t => t.id !== task.id);
+    _renderFilterBar();
+    _renderTasks();
+    haptic(15);
+  } catch (err) {
+    if (DEBUG) console.error('deleteTask failed', err);
+    toast('Could not delete task', 'error');
   }
 }
 

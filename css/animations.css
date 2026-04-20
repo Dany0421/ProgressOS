@@ -37,31 +37,84 @@
 .levelup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 13, 0.95);
+  background: rgba(10, 10, 13, 0.97);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 4000;
-  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.levelup-overlay--visible { opacity: 1; }
+
+.levelup-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px;
+  width: 100%;
+  max-width: 360px;
 }
 
 .levelup-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--text-secondary);
+  letter-spacing: 0.25em;
+  color: var(--accent-primary);
   text-transform: uppercase;
+}
+
+@keyframes levelup-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 
 .levelup-number {
   font-family: 'Syne', sans-serif;
-  font-size: 96px;
+  font-size: 112px;
   font-weight: 800;
   color: var(--accent-primary);
-  text-shadow: 0 0 40px var(--accent-glow);
+  text-shadow: 0 0 60px var(--accent-glow), 0 0 120px rgba(163,255,18,0.2);
   line-height: 1;
+  opacity: 0;
+}
+.levelup-number--pop {
+  animation: levelup-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.levelup-bar-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.levelup-bar-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.levelup-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-primary);
+  border-radius: 3px;
+  box-shadow: 0 0 12px var(--accent-glow);
+  transition: width 0.7s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.levelup-bar-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
 }
 
 .levelup-sub {
@@ -71,8 +124,8 @@
 }
 
 .levelup-btn {
-  margin-top: 24px;
-  padding: 12px 32px;
+  margin-top: 12px;
+  padding: 14px 40px;
   background: var(--accent-primary);
   color: #0A0A0D;
   font-family: 'DM Sans', sans-serif;
@@ -81,7 +134,14 @@
   border-radius: var(--radius-inner);
   cursor: pointer;
   border: none;
-  min-height: 48px;
+  min-height: 52px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.levelup-btn--visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Timer running pulse */
@@ -95,3 +155,47 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
+
+/* Habit card complete pulse */
+@keyframes habit-pulse {
+  0%   { border-color: var(--border-subtle); box-shadow: none; }
+  40%  { border-color: var(--accent-primary); box-shadow: 0 0 18px var(--accent-glow); }
+  100% { border-color: var(--accent-primary); box-shadow: 0 0 18px var(--accent-glow); }
+}
+.habit-card--pulse { animation: habit-pulse 500ms ease-out forwards; }
+
+/* Habit streak counter bounce */
+@keyframes streak-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); color: var(--accent-primary); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.habit-streak--bounce { animation: streak-bounce 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* Flame icon flicker on streak milestone (7/30/100d) */
+@keyframes fire-flicker {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(1.6) rotate(-12deg); opacity: 0.8; }
+  40%  { transform: scale(0.9) rotate(8deg); opacity: 1; }
+  60%  { transform: scale(1.5) rotate(-8deg); opacity: 0.7; }
+  80%  { transform: scale(0.95) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.streak-flame { display: inline-block; }
+.streak-flame--flicker { animation: fire-flicker 0.4s ease-in-out 3; }
+
+/* Onboarding modal */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 13, 0.92);
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.onboarding-overlay--visible { opacity: 1; }

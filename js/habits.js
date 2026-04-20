@@ -47,7 +47,7 @@ async function _checkStreaks() {
     const prevDay = prevScheduledDate(activeDays);
     if (!prevDay || last >= prevDay) continue; // completed on last scheduled day, fine
 
-    if (_profile.freezes_available > 0) {
+    if (_profile.freezes_available > 0 && habit.current_streak >= 3) {
       const ok = await consumeFreeze(_userId, habit, prevDay);
       if (ok) _profile.freezes_available--;
     } else {
@@ -189,7 +189,14 @@ function _createHabitCard(habit) {
 
   const streak = document.createElement('p');
   streak.className = 'habit-streak mono';
-  streak.textContent = `${habit.current_streak} day${habit.current_streak !== 1 ? 's' : ''}`;
+  const flameSpan = document.createElement('span');
+  flameSpan.className = 'streak-flame';
+  flameSpan.textContent = '🔥';
+  streak.appendChild(flameSpan);
+  const streakText = document.createElement('span');
+  streakText.className = 'streak-text';
+  streakText.textContent = ` ${habit.current_streak} day${habit.current_streak !== 1 ? 's' : ''}`;
+  streak.appendChild(streakText);
   body.appendChild(streak);
 
   const milestones = document.createElement('div');
@@ -286,6 +293,24 @@ async function _completeHabit(habit, cardEl, toggleEl, rightEl) {
     cardEl.querySelectorAll('.milestone-badge').forEach((badge, i) => {
       if (newStreak >= [7, 30, 100][i]) badge.classList.add('milestone-badge--unlocked');
     });
+
+    cardEl.classList.add('habit-card--pulse');
+    const streakEl = cardEl.querySelector('.habit-streak');
+    if (streakEl) {
+      const streakTextEl = streakEl.querySelector('.streak-text');
+      if (streakTextEl) streakTextEl.textContent = ` ${newStreak} day${newStreak !== 1 ? 's' : ''}`;
+      streakEl.classList.add('habit-streak--bounce');
+      setTimeout(() => streakEl.classList.remove('habit-streak--bounce'), 600);
+
+      if ([7, 30, 100].includes(newStreak)) {
+        const flameEl = streakEl.querySelector('.streak-flame');
+        if (flameEl) {
+          flameEl.classList.add('streak-flame--flicker');
+          setTimeout(() => flameEl.classList.remove('streak-flame--flicker'), 1500);
+        }
+      }
+    }
+    setTimeout(() => cardEl.classList.remove('habit-card--pulse'), 600);
 
     haptic([10, 30, 10]);
 

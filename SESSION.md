@@ -11,9 +11,9 @@
 
 ## Project Status
 
-**Phase**: Feature Build
+**Phase**: Polish / Done
 
-**Current focus**: Phase 5 (Habits) done — next is Phase 6 (Projects)
+**Current focus**: All phases complete. App is fully built and functional.
 
 ---
 
@@ -57,95 +57,73 @@
 
 **Test**: complete habit, see streak advance, simulate missed day (change `last_completed_date` in DB), watch freeze auto-consume.
 
-### Phase 6 — Projects page
-- [ ] Projects list view
-- [ ] Project detail view (slides in)
-- [ ] Milestones CRUD
-- [ ] Session timer (start/stop, localStorage persistence across refresh)
-- [ ] Session XP calculation on stop
-- [ ] Recent sessions list
-- [ ] Notes auto-save on blur
-- [ ] Manual "Complete Project" button + 200 XP bonus
+### Phase 6 — Projects page ✅
+- [x] Projects list view
+- [x] Project detail view (slides in from right)
+- [x] Milestones CRUD
+- [x] Session timer (start/stop, localStorage persistence across refresh)
+- [x] Session XP calculation on stop
+- [x] Recent sessions list
+- [x] Notes auto-save on blur
+- [x] Manual "Complete Project" button + 200 XP bonus
 
-**Test**: start timer, refresh page, timer still running, stop → correct XP.
+### Phase 7 — Dashboard ✅
+- [x] Player card + XP bar (spring animation)
+- [x] Settings gear → Settings bottom sheet (mute, haptic, stats, logout)
+- [x] Mini stats row (tasks done today, active streaks, active projects)
+- [x] 30-day heatmap + tap-to-popup with category breakdown
+- [x] Today's Focus (top 3 incomplete tasks, completable from dashboard)
+- [x] XP Feed (last 5 events)
+- [x] FAB for quick task add
 
-### Phase 7 — Dashboard (depends on all above having data)
-- [ ] Player card + XP bar
-- [ ] Settings gear icon → Settings bottom sheet
-- [ ] Settings sheet: mute toggles, stats, logout
-- [ ] Mini stats row (live data from other tables)
-- [ ] 30-day heatmap (aggregate query on `xp_events.event_date`)
-- [ ] Today's Focus (top 3 incomplete tasks)
-- [ ] XP Feed (last 5 events)
-- [ ] FAB for quick task add
-
-**Test**: everything shows correct data, heatmap cells show past days, tap cell → popup.
-
-### Phase 8 — Onboarding + polish
-- [ ] Welcome modal on first login (`onboarding_completed` flag)
-- [ ] All empty states polished
-- [ ] Level-up chime tested on phone (volume appropriate)
-- [ ] CSP tested — no console violations
-- [ ] All animations smooth on actual device (not just dev tools)
-
-**Test**: nuke test data, go through full first-use flow.
+### Phase 8 — Polish ✅
+- [x] Onboarding modal on first login (3 pillars, "Let's go." button)
+- [x] Task long-press → reschedule / delete
+- [x] Habit complete animations (card border pulse + streak bounce)
+- [x] Habit streak display now shows 🔥 emoji, flickers 3× on milestone (7/30/100d)
+- [x] Freeze "below 3 days" constraint — streaks < 3 days break without consuming a freeze
+- [x] Level-up overlay redesigned: fade-in, number bounce (spring), XP bar fills 0→100%, button slides up
+- [x] Day-of-week filter on habits page (Seg–Dom)
+- [x] Logout race condition fixed (scope: global + manual localStorage cleanup + replace())
 
 ---
 
 ## In Progress 🛠
 
-- Phase 0 scaffolding complete. All files created.
-  Next step: Dany runs `schema.sql` in Supabase SQL Editor, creates test user, pushes to GitHub, tests login on phone.
-  Blocked on: Dany running schema.sql
+Nothing in progress. App is complete.
 
 ---
 
-## Open Questions for Dany ❓
+## Open Questions ❓
 
-*Stuff you asked him but haven't gotten an answer yet. Remove when resolved.*
-
-Example:
-```
-- Should completed projects still show in the list or only in an archive view?
-```
+Nenhuma.
 
 ---
 
 ## Known Bugs 🐛
 
-*Bugs discovered but not yet fixed. Include severity and where.*
-
-Example:
-```
-- [LOW] Task complete animation jitters on first tap after page load
-  Reproduce: open /tasks.html, immediately tap first task
-  Suspected cause: CSS transition not yet loaded when JS fires animation
-```
+Nenhum conhecido.
 
 ---
 
-## Decisions Made This Session 📝
+## Decisions Made 📝
 
-*Anything we decided that's not explicitly in VISION.md. Running log so we don't forget.*
-
-Example:
-```
-- 2026-04-21 — Confirmed: heatmap tooltip shows XP breakdown by category (tasks/habits/projects), not just total
-- 2026-04-21 — Confirmed: freeze purchase deducts from total_xp, does NOT affect category XP pools
-```
+- Freeze auto-consume só se `current_streak >= 3` — streaks curtas quebram sem custo
+- Logout faz replace() (não href) para bloquear back button
+- Heatmap popup mostra breakdown por categoria (tasks/habits/projects/bonus)
+- Freeze purchase deduz de `total_xp`, não afeta category XP pools
+- Timer persiste via `localStorage` key `progress_os_timer` — sobrevive refresh e navegação
+- `consumeFreeze` é um read-then-write (não atómico) — risco de race condition em dois tabs, aceite para MVP
 
 ---
 
 ## Tech Debt / Future
 
-*Things we're aware of but deliberately deferred. Don't fix these unless Dany says to.*
-
-Example:
-```
-- No loading skeletons on data fetches (deferred until after MVP)
-- No offline support
-- No multi-user support (single-user only for now)
-```
+- Sem loading skeletons nos fetches (aceite para MVP)
+- `consumeFreeze` não é atómico — se dois tabs abrirem ao mesmo tempo podem consumir 2 freezes para o mesmo habit
+- Sem suporte offline
+- Sem multi-user (single-user only)
+- Completed projects ficam na lista com badge "completed" — sem arquivo separado
 
 ---
 

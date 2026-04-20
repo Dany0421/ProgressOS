@@ -89,32 +89,70 @@ function showLevelUp(newLevel) {
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 
+  const inner = document.createElement('div');
+  inner.className = 'levelup-inner';
+
   const label = document.createElement('p');
   label.className = 'levelup-label';
   label.textContent = 'LEVEL UP';
+  inner.appendChild(label);
 
   const num = document.createElement('div');
   num.className = 'levelup-number';
   num.textContent = newLevel;
+  inner.appendChild(num);
+
+  const barWrap = document.createElement('div');
+  barWrap.className = 'levelup-bar-wrap';
+  const barTrack = document.createElement('div');
+  barTrack.className = 'levelup-bar-track';
+  const barFill = document.createElement('div');
+  barFill.className = 'levelup-bar-fill';
+  barTrack.appendChild(barFill);
+  barWrap.appendChild(barTrack);
+
+  const barLabel = document.createElement('p');
+  barLabel.className = 'levelup-bar-label mono';
+  barLabel.textContent = `LVL ${newLevel}`;
+  barWrap.appendChild(barLabel);
+  inner.appendChild(barWrap);
 
   const sub = document.createElement('p');
   sub.className = 'levelup-sub';
   sub.textContent = 'Keep going.';
+  inner.appendChild(sub);
 
   const btn = document.createElement('button');
   btn.className = 'levelup-btn';
   btn.textContent = 'Continue';
-  btn.addEventListener('click', () => overlay.remove());
+  btn.addEventListener('click', () => {
+    overlay.classList.remove('levelup-overlay--visible');
+    overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+  });
+  inner.appendChild(btn);
 
-  overlay.appendChild(label);
-  overlay.appendChild(num);
-  overlay.appendChild(sub);
-  overlay.appendChild(btn);
+  overlay.appendChild(inner);
   document.body.appendChild(overlay);
 
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
+    if (e.target === overlay) btn.click();
   });
 
   haptic([30, 50, 30]);
+
+  // Sequence: fade in → bounce number → fill bar → show button
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      overlay.classList.add('levelup-overlay--visible');
+      num.classList.add('levelup-number--pop');
+
+      setTimeout(() => {
+        barFill.style.width = '100%';
+      }, 350);
+
+      setTimeout(() => {
+        btn.classList.add('levelup-btn--visible');
+      }, 900);
+    }, 20);
+  });
 }

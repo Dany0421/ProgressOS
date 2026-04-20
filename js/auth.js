@@ -19,11 +19,16 @@ async function checkSession() {
 
 async function logout() {
   try {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: 'global' });
   } catch (err) {
     if (DEBUG) console.error('logout failed', err);
   }
-  window.location.href = 'login.html';
+  // Belt-and-suspenders: force-clear all Supabase tokens from localStorage
+  // so getSession() on login.html never sees a stale session
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('sb-')) localStorage.removeItem(k);
+  });
+  window.location.replace('login.html');
 }
 
 async function checkAndGrantFreeze(userId) {

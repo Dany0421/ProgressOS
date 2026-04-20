@@ -41,8 +41,11 @@ create table if not exists habits (
   longest_streak integer default 0,
   last_completed_date date,
   total_completions integer default 0,
+  active_days integer[] default '{0,1,2,3,4,5,6}',  -- 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
   created_at timestamptz default now()
 );
+-- If table already exists, run this separately:
+-- ALTER TABLE habits ADD COLUMN IF NOT EXISTS active_days integer[] DEFAULT '{0,1,2,3,4,5,6}';
 
 create table if not exists habit_logs (
   id uuid primary key default gen_random_uuid(),

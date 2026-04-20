@@ -12,11 +12,31 @@
 </head>
 <body>
   <main class="page-content" id="main-content">
-    <header class="page-header">
-      <h1 class="page-title">Projects</h1>
-    </header>
-    <!-- Phase 6 content goes here -->
+
+    <!-- List View -->
+    <div class="projects-list-view" id="projects-list-view">
+      <header class="page-header">
+        <h1 class="page-title">Projects</h1>
+      </header>
+      <div id="project-list" class="project-list"></div>
+    </div>
+
+    <!-- Detail View (slides in from right) -->
+    <div class="project-detail-view" id="project-detail-view">
+      <header class="detail-header">
+        <button class="btn-back" id="btn-back" aria-label="Back to projects">
+          <i data-lucide="arrow-left"></i>
+        </button>
+        <h1 class="detail-title" id="detail-title"></h1>
+      </header>
+      <div id="detail-content" class="detail-content"></div>
+    </div>
+
   </main>
+
+  <button class="fab" id="fab-add" aria-label="Add project">
+    <i data-lucide="plus"></i>
+  </button>
 
   <nav class="bottom-nav" aria-label="Main navigation">
     <a href="index.html" class="nav-item">

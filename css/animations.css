@@ -83,3 +83,15 @@
   border: none;
   min-height: 48px;
 }
+
+/* Timer running pulse */
+@keyframes timer-pulse {
+  0%, 100% { box-shadow: 0 0 16px var(--accent-glow); }
+  50%       { box-shadow: 0 0 36px rgba(163,255,18,0.45); }
+}
+
+/* Timer running dot blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}

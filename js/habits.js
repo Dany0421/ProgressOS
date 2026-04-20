@@ -3,6 +3,7 @@ var DEBUG = false;
 var _habits = [];
 var _userId = null;
 var _profile = null;
+var _selectedDow = null; // day-of-week filter; null until init
 
 document.addEventListener('DOMContentLoaded', async () => {
   const session = await checkSession();
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   _userId = session.user.id;
 
   try {
+    _selectedDow = todayDayOfWeek();
     await _loadData();
     await _checkStreaks();
     _renderAll();
@@ -85,6 +87,32 @@ function _renderHeader() {
   if (dateEl) dateEl.textContent = formatDate(todayLocal());
   _renderFreezeCount();
   _updateBuyButton();
+  _renderDayFilter();
+}
+
+function _renderDayFilter() {
+  const container = document.getElementById('habits-day-filter');
+  if (!container) return;
+  container.textContent = '';
+
+  const todayDow = todayDayOfWeek();
+  const dayDefs = [
+    { label: 'Seg', dow: 1 }, { label: 'Ter', dow: 2 }, { label: 'Qua', dow: 3 },
+    { label: 'Qui', dow: 4 }, { label: 'Sex', dow: 5 }, { label: 'Sab', dow: 6 },
+    { label: 'Dom', dow: 0 }
+  ];
+
+  dayDefs.forEach(({ label, dow }) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (dow === _selectedDow ? ' filter-btn--active' : '');
+    btn.textContent = dow === todayDow ? label + ' ·' : label;
+    btn.addEventListener('click', () => {
+      _selectedDow = dow;
+      _renderDayFilter();
+      _renderHabits();
+    });
+    container.appendChild(btn);
+  });
 }
 
 function _renderFreezeCount() {
@@ -113,28 +141,27 @@ function _renderHabits() {
   if (!list) return;
   list.textContent = '';
 
-  const todayDow = todayDayOfWeek();
-  const todayHabits = _habits.filter(h => {
+  const filtered = _habits.filter(h => {
     const days = h.active_days || [0,1,2,3,4,5,6];
-    return days.includes(todayDow);
+    return days.includes(_selectedDow);
   });
 
-  if (todayHabits.length === 0) {
+  if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     const title = document.createElement('p');
     title.className = 'empty-state-title';
-    title.textContent = 'No habits yet.';
+    title.textContent = 'No habits this day.';
     const sub = document.createElement('p');
     sub.className = 'empty-state-sub';
-    sub.textContent = 'Start one.';
+    sub.textContent = 'Add one or pick another day.';
     empty.appendChild(title);
     empty.appendChild(sub);
     list.appendChild(empty);
     return;
   }
 
-  todayHabits.forEach(habit => list.appendChild(_createHabitCard(habit)));
+  filtered.forEach(habit => list.appendChild(_createHabitCard(habit)));
 }
 
 function _createHabitCard(habit) {
@@ -191,8 +218,11 @@ function _createHabitCard(habit) {
     lucide.createIcons();
   }
 
-  if (!isDone) {
+  const isToday = _selectedDow === todayDayOfWeek();
+  if (!isDone && isToday) {
     toggle.addEventListener('click', () => _completeHabit(habit, card, toggle, right));
+  } else if (!isToday) {
+    toggle.disabled = true;
   }
 
   const xpEl = document.createElement('span');
@@ -415,10 +445,18 @@ async function _addHabit(title, activeDays) {
     await _loadData();
     _renderHabits();
     haptic(15);
+    const label = _activeDaysLabel(activeDays);
+    toast(`Habit saved — ${label}`);
   } catch (err) {
     if (DEBUG) console.error('addHabit failed', err);
     toast('Could not add habit', 'error');
   }
+}
+
+function _activeDaysLabel(days) {
+  if (days.length === 7) return 'every day';
+  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return [...days].sort((a, b) => a - b).map(d => names[d]).join(', ');
 }
 
 async function _buyFreeze() {

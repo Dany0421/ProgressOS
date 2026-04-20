@@ -5,15 +5,15 @@
 ---
 
 ## Last Updated
-2026-04-20
+2026-04-21
 
 ---
 
 ## Project Status
 
-**Phase**: Setup
+**Phase**: Feature Build
 
-**Current focus**: Phase 0 scaffolding done — waiting for Dany to run schema.sql and create test user
+**Current focus**: Phase 5 (Habits) done — next is Phase 6 (Projects)
 
 ---
 
@@ -21,61 +21,39 @@
 
 *Build in this order. Do not skip ahead — later phases depend on earlier ones. Each phase should be testable on the phone before moving on.*
 
-### Phase 0 — Setup (one-time, see SETUP.md)
+### Phase 0 — Setup ✅
 - [x] Supabase project created, keys saved
-- [ ] Schema SQL run (all tables + indexes + RLS policies) ← **NEXT: Dany runs schema.sql**
-- [ ] `award_xp` RPC function created (included in schema.sql)
-- [ ] Test user created manually in Supabase dashboard ← **after schema runs**
-- [x] Folder structure scaffolded (HTML + CSS + JS files per VISION §8/§9)
-- [ ] Git repo initialized, connected to GitHub, Pages enabled
+- [x] Schema SQL run (all tables + indexes + RLS + award_xp RPC)
+- [x] Test user created, profile row inserted manually
+- [x] Folder structure scaffolded
+- [x] Git repo + GitHub Pages live
 
-### Phase 1 — Foundation (no visible UI yet)
-- [ ] `supabase.js` — client init, pinned version
-- [ ] `time.js` — `todayLocal()`, `yesterdayLocal()`, `daysBetween()`
-- [ ] `auth.js` — session check, redirect logic, `logout()`
-- [ ] `login.html` — minimal login form
-- [ ] CSP meta tag + Google Fonts + Lucide CDN in HTML template
-- [ ] `base.css` — tokens, reset, typography, safe-area handling
+### Phase 1 — Foundation ✅
+- [x] `supabase.js`, `time.js`, `auth.js`, `login.html`, `base.css`
+- [x] Login works, session persists, logout via Settings sheet on Dashboard
 
-**Test**: can log in, session persists across reloads, logout redirects to login.
+### Phase 2 — Shared components ✅
+- [x] Bottom nav, `ui.js`, `sound.js`, `components.css`, `animations.css`
 
-### Phase 2 — Shared components
-- [ ] Bottom nav component (HTML structure + CSS + active state logic)
-- [ ] `ui.js` — `toast()`, `showBottomSheet()`, `hideBottomSheet()`, `haptic()`
-- [ ] `sound.js` — `playTick()`, `playLevelUpChime()`, mute state from localStorage
-- [ ] `components.css` — cards, buttons, badges, FAB, bottom sheet
-- [ ] `animations.css` — task complete, XP float, level-up overlay
+### Phase 3 — XP engine ✅
+- [x] `xp.js` — `awardXP()` via `award_xp` RPC, level-up overlay, floatXP, daily cap
 
-**Test**: toast appears on demand, bottom sheet slides up/down, nav tabs navigate.
+### Phase 4 — Tasks ✅
+- [x] Task list, complete flow (haptic + sound + XP float), add sheet, filters, XP pill, empty state
+- [x] All-tasks-done +50 XP bonus
+- [x] Carried-over tasks
 
-### Phase 3 — XP engine (core system)
-- [ ] `xp.js` — `awardXP()` using `award_xp` RPC
-- [ ] Level formula implementation
-- [ ] `showLevelUp()` overlay (persistent, tap to dismiss)
-- [ ] `floatXP()` animation helper
-- [ ] Daily cap check inside RPC
-
-**Test**: manually call `awardXP()` from console, see toast + XP update + level-up if crossed.
-
-### Phase 4 — Tasks page (first real feature, end-to-end)
-- [ ] Task list render (using `createElement`, NOT `innerHTML` — see CLAUDE §6.5)
-- [ ] Complete task flow (with all feedback: haptic + sound + visual + XP float)
-- [ ] Add task bottom sheet
-- [ ] Filter bar: All / Pending / Done / Carried Over
-- [ ] Carried-over detection + badge
-- [ ] Daily XP counter pill (128 / 250 XP today)
-- [ ] Empty state
-
-**Test**: full task lifecycle on phone — create, complete, hit cap, carry over next day.
-
-### Phase 5 — Habits page
-- [ ] Habit list render
-- [ ] `freezes.js` — grant check, consume, purchase
-- [ ] Streak check logic (on page load, before render)
-- [ ] Toggle completion flow + XP award + streak increment
-- [ ] Milestone detection (7/30/100) + bonus XP
-- [ ] Freeze shop button + purchase flow
-- [ ] Freeze auto-consume + xp_event log
+### Phase 5 — Habits ✅
+- [x] Habit list render (filtered by active_days + today's day of week)
+- [x] `freezes.js` — consume, purchase
+- [x] Streak check on page load (with active_days logic)
+- [x] Toggle completion + XP + streak increment
+- [x] Milestone detection (7/30/100d) + bonus XP
+- [x] Freeze pill in header + buy freeze button
+- [x] Freeze auto-consume + xp_event log
+- [x] Day-of-week selector in add sheet (Seg–Dom)
+- [x] Long press to delete habit
+- **Schema addition**: `habits.active_days integer[] default '{0,1,2,3,4,5,6}'`
 
 **Test**: complete habit, see streak advance, simulate missed day (change `last_completed_date` in DB), watch freeze auto-consume.
 

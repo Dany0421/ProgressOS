@@ -1,2 +1,88 @@
 /* components.css — cards, buttons, badges, FAB, bottom sheet, filters, heatmap cells, forms */
-/* Populated in Phases 2–7 */
+
+/* ---- Icon button (gear, close, etc.) ---- */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-inner);
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* ---- Bottom sheet ---- */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1500;
+  opacity: 0;
+  transition: opacity var(--transition-med);
+  display: flex;
+  align-items: flex-end;
+}
+.sheet-overlay--visible { opacity: 1; }
+
+.bottom-sheet {
+  width: 100%;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 20px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform var(--transition-med);
+  max-height: 85dvh;
+  overflow-y: auto;
+}
+.sheet-overlay--visible .bottom-sheet { transform: translateY(0); }
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+}
+.sheet-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--text-muted);
+  border-radius: var(--radius-badge);
+}
+.sheet-close svg { width: 18px; height: 18px; }
+
+/* ---- Settings content ---- */
+.settings-content { padding-bottom: 8px; }
+
+/* ---- Danger outline button ---- */
+.btn-danger-outline {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-inner);
+  color: var(--danger);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 52px;
+  transition: background var(--transition-fast);
+}
+.btn-danger-outline:active { background: rgba(255, 59, 59, 0.08); }

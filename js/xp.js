@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 function xpForLevel(n) {
   if (n <= 1) return 0;

@@ -63,7 +63,7 @@ Don't move to the next task until Dany confirms it works. If he reports a bug, f
 - Vanilla JS only. No npm. No frameworks. Supabase via CDN.
 - File naming: `lowercase-hyphen.js`. No camelCase filenames.
 - No inline styles. No inline `<script>` tags with logic (CDN imports only).
-- Every file starts with a `DEBUG` constant: `const DEBUG = false;`
+- Every file starts with a `DEBUG` constant: `var DEBUG = false;` (must be `var`, not `const` — multiple scripts share the same global scope and `const` throws on re-declaration)
 - Console logs wrapped: `if (DEBUG) console.log(...)`
 
 ### Editing

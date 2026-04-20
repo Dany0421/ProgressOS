@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 let _audioCtx = null;
 

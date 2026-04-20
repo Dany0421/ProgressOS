@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 // Habits page — implemented in Phase 5
 document.addEventListener('DOMContentLoaded', async () => {

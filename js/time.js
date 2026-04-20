@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 const TIMEZONE = 'Africa/Maputo';
 

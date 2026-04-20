@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 // Projects page — implemented in Phase 6
 document.addEventListener('DOMContentLoaded', async () => {

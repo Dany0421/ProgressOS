@@ -1,4 +1,4 @@
-const DEBUG = false;
+var DEBUG = false;
 
 function toast(message, type = 'success') {
   const existing = document.querySelector('.toast');

@@ -5,16 +5,15 @@
 ---
 
 ## Last Updated
-*YYYY-MM-DD — fill in when updating*
+2026-04-20
 
 ---
 
 ## Project Status
 
-**Phase**: Setup / Foundation / Feature Build / Polish
-*(update as project progresses)*
+**Phase**: Setup
 
-**Current focus**: *what you're actively building right now*
+**Current focus**: Phase 0 scaffolding done — waiting for Dany to run schema.sql and create test user
 
 ---
 
@@ -23,11 +22,11 @@
 *Build in this order. Do not skip ahead — later phases depend on earlier ones. Each phase should be testable on the phone before moving on.*
 
 ### Phase 0 — Setup (one-time, see SETUP.md)
-- [ ] Supabase project created, keys saved
-- [ ] Schema SQL run (all tables + indexes + RLS policies)
-- [ ] `award_xp` RPC function created (see CLAUDE.md §6.7)
-- [ ] Test user created manually in Supabase dashboard
-- [ ] Folder structure scaffolded (empty HTML + CSS + JS files per VISION §8/§9)
+- [x] Supabase project created, keys saved
+- [ ] Schema SQL run (all tables + indexes + RLS policies) ← **NEXT: Dany runs schema.sql**
+- [ ] `award_xp` RPC function created (included in schema.sql)
+- [ ] Test user created manually in Supabase dashboard ← **after schema runs**
+- [x] Folder structure scaffolded (HTML + CSS + JS files per VISION §8/§9)
 - [ ] Git repo initialized, connected to GitHub, Pages enabled
 
 ### Phase 1 — Foundation (no visible UI yet)
@@ -117,14 +116,9 @@
 
 ## In Progress 🛠
 
-*What's half-done. Be specific about the exact next step.*
-
-Example format:
-```
-- Building habits page — streak reset logic
-  Next step: write the freeze auto-consume branch in `habits.js` checkStreaks()
-  Blocked on: nothing
-```
+- Phase 0 scaffolding complete. All files created.
+  Next step: Dany runs `schema.sql` in Supabase SQL Editor, creates test user, pushes to GitHub, tests login on phone.
+  Blocked on: Dany running schema.sql
 
 ---
 
@@ -197,5 +191,7 @@ Example:
   SESSION.md
 ```
 
-**Supabase URL**: *paste from dashboard when set up*
+**Supabase URL**: https://dhrgjtnsyzybjsfaftrm.supabase.co
+**Supabase anon key**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmdqdG5zeXp5YmpzZmFmdHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTc5MTQsImV4cCI6MjA5MjI5MzkxNH0.wQ6vJ_KUVMt7CturBfVvLJ088WpX1f4pUPfsXlKi1LY
+**Lucide CDN version**: 0.460.0 (pinned — don't use @latest)
 **Test user email**: *paste when created*

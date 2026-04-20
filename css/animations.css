@@ -1,0 +1,71 @@
+/* animations.css — task complete, XP float, level-up overlay, habit toggle pulse, streak flash, particle burst */
+/* Populated in Phases 2–7 */
+
+/* XP float */
+@keyframes xp-float {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-60px); }
+}
+
+.xp-float {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--xp-color);
+  pointer-events: none;
+  animation: xp-float 0.8s ease-out forwards;
+  transform: translateX(-50%);
+  z-index: 3000;
+}
+
+/* Level-up overlay */
+.levelup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 13, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+  gap: 12px;
+}
+
+.levelup-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.levelup-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 96px;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-shadow: 0 0 40px var(--accent-glow);
+  line-height: 1;
+}
+
+.levelup-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.levelup-btn {
+  margin-top: 24px;
+  padding: 12px 32px;
+  background: var(--accent-primary);
+  color: #0A0A0D;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius-inner);
+  cursor: pointer;
+  border: none;
+  min-height: 48px;
+}

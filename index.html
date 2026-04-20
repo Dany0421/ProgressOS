@@ -12,14 +12,16 @@
 </head>
 <body>
   <main class="page-content" id="main-content">
-    <header class="page-header">
-      <h1 class="page-title">Dashboard</h1>
-      <button class="icon-btn" id="settings-btn" aria-label="Settings">
-        <i data-lucide="settings"></i>
-      </button>
-    </header>
-    <!-- Phase 7 content goes here -->
+    <div id="player-card"></div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="dashboard-section" id="heatmap-section"></div>
+    <div class="dashboard-section" id="focus-section"></div>
+    <div class="dashboard-section" id="feed-section"></div>
   </main>
+
+  <button class="fab" id="fab-add" aria-label="Add task">
+    <i data-lucide="plus"></i>
+  </button>
 
   <nav class="bottom-nav" aria-label="Main navigation">
     <a href="index.html" class="nav-item active" aria-current="page">

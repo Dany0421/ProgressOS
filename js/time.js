@@ -22,3 +22,19 @@ function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
 }
+
+function todayDayOfWeek() {
+  return new Date(todayLocal() + 'T12:00:00').getDay();
+}
+
+// Returns the most recent date before today where day-of-week is in activeDays
+function prevScheduledDate(activeDays) {
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(todayLocal() + 'T12:00:00');
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+    const dow = new Date(dateStr + 'T12:00:00').getDay();
+    if (activeDays.includes(dow)) return dateStr;
+  }
+  return null;
+}

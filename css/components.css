@@ -281,8 +281,139 @@
 .priority-btn--medium.priority-btn--active { color: var(--priority-med);  border-color: var(--priority-med);  background: rgba(255, 184, 48, 0.1); }
 .priority-btn--high.priority-btn--active   { color: var(--priority-high); border-color: var(--priority-high); background: rgba(255, 59, 59, 0.1); }
 
-/* ---- Settings content ---- */
-.settings-content { padding-bottom: 8px; }
+/* ---- Page subtitle ---- */
+.page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ---- Habits header ---- */
+.habits-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding-top: env(safe-area-inset-top); }
+.habits-header-top { display: flex; flex-direction: column; gap: 2px; }
+.habits-header-bottom { display: flex; align-items: center; gap: 10px; }
+
+.freeze-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  color: #88CCFF;
+  background: rgba(136, 204, 255, 0.08);
+  border: 1px solid rgba(136, 204, 255, 0.2);
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+.freeze-pill svg { width: 13px; height: 13px; }
+
+.btn-freeze {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 5px 12px;
+  min-height: 30px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.btn-freeze:not(:disabled):active { color: #88CCFF; border-color: rgba(136, 204, 255, 0.4); }
+.btn-freeze:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ---- Habit list ---- */
+.habit-list { display: flex; flex-direction: column; gap: 10px; }
+
+.habit-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  transition: border-color var(--transition-fast);
+}
+
+.habit-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.habit-name { font-size: 15px; font-weight: 500; }
+.habit-streak { font-size: 13px; font-weight: 600; color: var(--streak-fire); }
+
+.habit-milestones { display: flex; gap: 6px; }
+.milestone-badge {
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 7px;
+  border-radius: var(--radius-badge);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+.milestone-badge--unlocked {
+  color: var(--accent-primary);
+  border-color: var(--border-active);
+  background: rgba(163, 255, 18, 0.06);
+}
+
+.habit-right { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.habit-toggle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.habit-toggle:not(:disabled):not(.habit-toggle--on):active {
+  border-color: var(--accent-primary);
+  background: rgba(163, 255, 18, 0.08);
+}
+.habit-toggle--on {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #0A0A0D;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.habit-toggle svg { width: 22px; height: 22px; }
+
+.habit-xp { font-size: 11px; font-weight: 600; color: var(--xp-color); }
+.habit-toggle--on ~ .habit-xp,
+.habit-right .habit-xp { color: var(--text-muted); }
+
+/* ---- Day-of-week selector ---- */
+.days-group { display: flex; gap: 6px; }
+.day-btn {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 4px;
+  border-radius: var(--radius-badge);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  min-height: 40px;
+  transition: all var(--transition-fast);
+}
+.day-btn--active {
+  color: var(--accent-primary);
+  border-color: var(--border-active);
+  background: rgba(163, 255, 18, 0.08);
+}
+
+/* ---- Settings / options sheet ---- */
+.settings-content { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
+.sheet-option-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 4px 0 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 4px;
+}
 
 /* ---- Danger outline button ---- */
 .btn-danger-outline {

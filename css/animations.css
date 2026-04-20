@@ -19,6 +19,20 @@
   z-index: 3000;
 }
 
+/* Task complete — lime border flash */
+@keyframes card-flash {
+  0%   { border-color: var(--border-subtle); box-shadow: none; }
+  40%  { border-color: var(--accent-primary); box-shadow: 0 0 20px var(--accent-glow); }
+  100% { border-color: var(--accent-primary); box-shadow: 0 0 20px var(--accent-glow); }
+}
+.task-card--completing { animation: card-flash 200ms ease-out forwards; }
+
+/* Strikethrough draws left-to-right on done */
+.task-card--done .task-title {
+  position: relative;
+  display: inline;
+}
+
 /* Level-up overlay */
 .levelup-overlay {
   position: fixed;

@@ -28,6 +28,8 @@ Four tabs, one bottom nav, everything runs on the phone.
 
 **Projects** — Long-running work with milestones, a session timer (start/stop, survives page refresh), recent session log, auto-saving notes, a manual "complete project" for the big +200 XP payoff, and an **Active / Completed** tab split so finished work archives cleanly.
 
+**Profile + Achievements** — Tap the player card to open a Profile view with big stats (Total XP, days active, tasks / habits / projects done, best streak) and a **Titles** row: unlock archetype achievements to earn titles that show under your name. From there, the **Achievements Gallery** lists 36 badges across 7 categories (XP, Streak, Volume, Rare, Trinity, Archetype, Title) with common / rare / legendary rarities. Unlock animations are tiered — toast for common, mini-modal for rare, fullscreen celebration for legendary. Hidden archetype badges stay as `???` until discovered.
+
 ---
 
 ## The XP system
@@ -43,8 +45,9 @@ Four tabs, one bottom nav, everything runs on the phone.
 | Complete project milestone | +40 |
 | Complete full project | +200 |
 | Project session | ~1 XP per 3min (min 5min — 15min = 5 XP, 1h = 20 XP) |
+| Achievement unlock — common / rare / legendary | +25 / +100 / +500 |
 
-**Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, and project completion bonuses are exempt from the cap so rare events always feel rewarding.
+**Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, project completion bonuses, and achievement rewards are all exempt from the cap so rare events always feel rewarding.
 
 **Bonus Day**: roughly once a week (14% chance per day, deterministic per-user), the task cap silently doubles to **500 XP**. You only discover it when you cross 250 — the next completed task still awards XP and a full-screen "BONUS DAY" overlay fires. Pure slot-machine dopamine.
 
@@ -69,6 +72,7 @@ Four tabs, one bottom nav, everything runs on the phone.
 - **XP awards are atomic**: handled server-side by a Postgres RPC (`award_xp`) that runs cap check, increment, event log, and level-up detection in a single transaction. Prevents race conditions from rapid taps or multi-tab use. Freeze consume/purchase use the same pattern (`consume_freeze`, `purchase_freeze`) with `FOR UPDATE` row locking.
 - **Security**: every table has RLS enabled with a `user_own_data` policy. No user can read or write another user's rows. Anon key is safe in the client; service role is never shipped.
 - **XSS-safe rendering**: all dynamic content uses `createElement` + `textContent`, never `innerHTML` with interpolation.
+- **Achievements**: all 36 badges live in an `achievements` table; unlocks are stored per-user in `user_achievements`. A single `check_achievements(user_id, trigger)` RPC dispatches to the right rules based on what just happened (task complete, habit complete, session stop, etc.) and returns any new unlocks. A one-shot `backfill_achievements(user_id)` walks the full history, inserts every qualifying unlock silently, posts ONE aggregated XP event so the XP Feed doesn't spam, and flags the rarest unlock as a pending celebration — so existing users get one legendary moment on first load, not 15 toasts.
 
 ---
 
@@ -82,9 +86,11 @@ ProgressOS/
 ├── projects.html       # Projects page
 ├── login.html          # Auth entry (login / sign up / reset password)
 ├── sql/                # schema.sql (tables + RLS + award_xp) + functions.sql (freeze RPCs, migrations)
+│                       # + achievements.sql (tables, seed, RPCs)
 ├── css/                # base.css, components.css, animations.css
 ├── js/                 # supabase, auth, time, xp, freezes, ui, sound,
-│                       # tasks, habits, projects, dashboard
+│                       # tasks, habits, projects, dashboard,
+│                       # achievements, profile, achievements-gallery
 ├── VISION.md           # Product spec (the source of truth)
 ├── CLAUDE.md           # Working rules for Claude Code sessions
 ├── SESSION.md          # Current build state, roadmap, open questions
@@ -103,7 +109,7 @@ Want your own instance? ~10 minutes.
 
 ### 2. Run the schema
 
-Supabase dashboard → SQL Editor → paste the contents of [`sql/schema.sql`](./sql/schema.sql) → Run. This creates all tables, indexes, RLS policies, and the `award_xp` RPC in one go. Then run [`sql/functions.sql`](./sql/functions.sql) for the freeze RPCs (`consume_freeze`, `purchase_freeze`).
+Supabase dashboard → SQL Editor → paste the contents of [`sql/schema.sql`](./sql/schema.sql) → Run. This creates all tables, indexes, RLS policies, and the `award_xp` RPC in one go. Then run [`sql/functions.sql`](./sql/functions.sql) for the freeze RPCs (`consume_freeze`, `purchase_freeze`) and [`sql/achievements.sql`](./sql/achievements.sql) for the achievements schema + 36 seed rows + `check_achievements` / `backfill_achievements` / `set_active_title` / `mark_achievements_seen` RPCs.
 
 ### 3. Create your user
 

@@ -5,15 +5,15 @@
 ---
 
 ## Last Updated
-2026-04-21
+2026-04-22
 
 ---
 
 ## Project Status
 
-**Phase**: Polish / Done
+**Phase**: Phase 10 — Achievements shipped
 
-**Current focus**: All phases complete. App is fully built and functional.
+**Current focus**: Achievements system live. 36 badges across 7 categories, atomic check/backfill RPCs, Profile + Gallery views, 3-tier unlock overlays. Backfill ran for Dany: 4 unlocks (title-initiate, first-bonus, cap-breaker legendary, trinity-day), +625 XP, level 2 → 3. Phone-tested Profile + Gallery + legendary celebration. All working.
 
 ---
 
@@ -100,6 +100,20 @@
 - [x] Day-of-week filter on habits page (Seg–Dom)
 - [x] Logout race condition fixed (scope: global + manual localStorage cleanup + replace())
 
+### Phase 10 — Achievements ✅
+- [x] **sql/achievements.sql** — `achievements` + `user_achievements` tables, RLS, 36 seed rows, ALTER on `xp_events.category` check to allow `'achievement'`, `profiles.active_title` + `profiles.pending_achievement_celebration` columns
+- [x] **RPCs** — `check_achievements(user_id, trigger jsonb)` central dispatcher, `backfill_achievements(user_id)` one-shot (silent inserts + single aggregated xp_event + pending_achievement_celebration = rarest), `set_active_title(user_id, title_id text)` (handles NULL for "None"), `mark_achievements_seen(user_id, ids text[])`
+- [x] **js/achievements.js** — `checkAchievements`, `processUnlocks` serialized, 3-tier overlay dispatcher (`showAchievementToast` common / `showAchievementModal` rare / `showAchievementLegendary` legendary), `checkPendingCelebration` called from auth restore, `fetchAchievementsState`, `setActiveTitle`, `markAchievementsSeen`
+- [x] **js/profile.js** — fullscreen slide-in Profile view. Hero (avatar + name + active title label + level/XP bar), 2×3 stats grid (Total XP, days active, tasks done, habits done, projects done, best streak), horizontal titles row (None pill + unlocked archetype pills), "X/Y UNLOCKED" progress bar + "Achievements →" button
+- [x] **js/achievements-gallery.js** — 3-col grid, filter row (ALL/XP/STREAK/VOLUME/RARE/TRINITY/ARCHETYPE/TITLE), rarity-colored borders, `???` for hidden-locked, detail bottom sheet with XP reward + TITLE tag, auto-mark NEW as seen on open
+- [x] **Integration hooks** — `check_achievements` calls wired into `xp.js` (xp_award, bonus_discovery, bonus_cap_hit), `tasks.js` (task_complete), `habits.js` (habit_complete + new_streak + longest_streak), `projects.js` (session_stop, milestone_complete, project_complete), `freezes.js` (freeze_consumed). All fire-and-forget (`.then()`, not awaited) so UI isn't blocked. Recursion guard in xp.js: skip check when category === 'achievement'
+- [x] **dashboard.js** — player card tappable → `openProfile()`, title name rendered under player name (active_title fetched from achievements table), listener idempotency via `dataset.clickBound` flag so re-renders don't stack handlers
+- [x] **CSS** — rarity tokens (`--rarity-common` acid lime, `--rarity-rare` fire orange, `--rarity-legendary` purple #B57BFF + gold #FFD166), Profile view styles, titles scroll row, achievements progress bar, gallery grid + card variants, detail sheet, locked-state guards so rarity rings aren't overridden
+- [x] **Real backfill** — ran for Dany: 4 unlocks, +625 XP (630→1255, level 2→3), `cap-breaker` legendary flagged for first-load celebration
+- [x] **Phone-tested** — Profile renders, titles switch, gallery filters, detail sheet, legendary celebration fires once on reload then clears
+
+**Total: 36 achievements** — 7 XP/Level, 5 Streak, 7 Volume, 4 Rare, 4 Trinity, 8 Archetype (hidden, all titles), 1 baseline Title (Initiate).
+
 ---
 
 ## In Progress 🛠
@@ -131,6 +145,11 @@ Nenhum conhecido.
 - `sessionXP` linear: `Math.round(min/3)` com mínimo 5min — 15min=5, 30min=10, 1h=20
 - **Bonus Day**: ~14% chance por dia (`abs(hashtext(user_id||date)) % 7 = 0`) — cap duplica para 500, discovery overlay dispara quando cruzas 250, ribbon "MAX 500 XP" quando atinges o novo cap
 - **UI consistency audit**: tokens `--text-on-accent` (#0A0A0D) e `--freeze-color` (#88CCFF) + `--freeze-glow` adicionados em `base.css`. Todos os hardcoded hexes em components.css/animations.css substituídos por tokens. `.sheet-option-label` duplicado removido (o primeiro bloco era dead code — só o segundo renderizava). Inline `btn.style.textTransform = 'capitalize'` em `tasks.js` removido — recurrence buttons agora herdam uppercase do `.priority-btn` (consistente com LOW/MED/HIGH)
+- **Achievements — rewards are cap-exempt**: nova category `'achievement'` no check constraint de `xp_events`. Achievement XP awards skip o daily task cap — rare events sempre recompensam.
+- **Achievements — single celebration on backfill**: backfill insere todos os unlocks `seen = true`, UM só xp_event agregado, e o achievement mais raro fica guardado em `profiles.pending_achievement_celebration`. No próximo load, `checkPendingCelebration()` dispara UMA animação e limpa o campo. Evita spammar novos utilizadores com 15 toasts.
+- **Achievements — recursion guard**: `xp.js._triggerAchievementChecks` não roda quando `category === 'achievement'`. Sem isso, o XP award de um achievement dispararia outro check → loop infinito se cascateasse com level-up.
+- **Achievements — fire-and-forget hooks**: todas as chamadas a `checkAchievements` nos action handlers (tasks/habits/projects/freezes) usam `.then()`, não `await`. UI nunca bloqueia à espera da RPC.
+- **Player-card listener idempotency**: `dashboard._renderPlayerCard` re-renderiza quando voltas do Profile. `textContent = ''` não remove listeners do próprio `el` — sem guard, cada re-render empilhava outro handler. Fix: `dataset.clickBound` flag.
 
 ---
 
@@ -141,6 +160,8 @@ Nenhum conhecido.
 - Sem suporte offline
 - Sem multi-user (single-user only)
 - Completed projects ficam na lista com badge "completed" — sem arquivo separado
+- Achievements — sem progress bars nos locked cards ("42/100 tasks done"), V2
+- Achievements — sem seasonal / sharing / nested unlocks (V2+)
 
 ---
 
@@ -156,7 +177,10 @@ Nenhum conhecido.
   login.html
   /js/
     supabase.js, auth.js, time.js, xp.js, freezes.js,
-    ui.js, sound.js, tasks.js, habits.js, projects.js, dashboard.js
+    ui.js, sound.js, tasks.js, habits.js, projects.js, dashboard.js,
+    achievements.js, profile.js, achievements-gallery.js
+  /sql/
+    schema.sql, functions.sql, achievements.sql
   /css/
     base.css, components.css, animations.css
   VISION.md

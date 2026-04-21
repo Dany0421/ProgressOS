@@ -309,6 +309,13 @@ async function _completeHabit(habit, cardEl, toggleEl, rightEl) {
 
     await _checkMilestone(habit, newStreak);
 
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(_userId, {
+        type: 'habit_complete',
+        meta: { habit_id: habit.id, new_streak: newStreak, longest_streak: newLongest }
+      }).then(unlocks => { if (unlocks && unlocks.length) processUnlocks(_userId, unlocks); });
+    }
+
     habit.last_completed_date = today;
     habit.current_streak = newStreak;
     habit.longest_streak = newLongest;

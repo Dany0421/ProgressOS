@@ -6,6 +6,7 @@ var _profile = null;
 var _xpEvents = [];
 var _focusTasks = [];
 var _stats = { tasksDone: 0, activeStreaks: 0, activeProjects: 0 };
+var _activeTitleName = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const session = await checkSession();
@@ -35,7 +36,7 @@ async function _loadAll() {
   const thirtyDaysAgo = _daysAgo(29);
 
   const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes] = await Promise.all([
-    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed').eq('id', _userId).single(),
+    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title').eq('id', _userId).single(),
     supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('completed', true).eq('due_date', today),
     supabase.from('habits').select('*', { count: 'exact', head: true }).eq('user_id', _userId).gt('current_streak', 0),
     supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('status', 'active'),
@@ -51,6 +52,16 @@ async function _loadAll() {
   _stats.activeStreaks = streaksRes.count || 0;
   _stats.activeProjects = projectsRes.count || 0;
 
+  _activeTitleName = null;
+  if (_profile.active_title) {
+    try {
+      const { data } = await supabase.from('achievements').select('name').eq('id', _profile.active_title).single();
+      if (data && data.name) _activeTitleName = data.name;
+    } catch (err) {
+      if (DEBUG) console.error('active_title fetch failed', err);
+    }
+  }
+
   const priorityOrder = { high: 0, medium: 1, low: 2 };
   _focusTasks = (focusRes.data || [])
     .sort((a, b) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1))
@@ -61,6 +72,27 @@ function _daysAgo(n) {
   const d = new Date(todayLocal() + 'T12:00:00');
   d.setDate(d.getDate() - n);
   return d.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+}
+
+// ---- Profile refresh hook (called by profile.js on close) ----
+
+async function _refreshPlayerCardAfterProfile() {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('active_title')
+      .eq('id', _userId).single();
+    if (error) throw error;
+    _profile.active_title = data.active_title;
+    _activeTitleName = null;
+    if (data.active_title) {
+      const { data: ach } = await supabase.from('achievements').select('name').eq('id', data.active_title).single();
+      if (ach && ach.name) _activeTitleName = ach.name;
+    }
+    _renderPlayerCard();
+  } catch (err) {
+    if (DEBUG) console.error('refreshPlayerCardAfterProfile failed', err);
+  }
 }
 
 // ---- Player Card ----
@@ -96,6 +128,13 @@ function _renderPlayerCard() {
   name.textContent = _profile.username || 'Player';
   info.appendChild(name);
 
+  if (_activeTitleName) {
+    const titleEl = document.createElement('p');
+    titleEl.className = 'player-title mono';
+    titleEl.textContent = _activeTitleName.toUpperCase();
+    info.appendChild(titleEl);
+  }
+
   const lvl = document.createElement('p');
   lvl.className = 'player-level mono';
   lvl.textContent = `LVL ${level}`;
@@ -108,12 +147,23 @@ function _renderPlayerCard() {
   const gearIcon = document.createElement('i');
   gearIcon.setAttribute('data-lucide', 'settings');
   gear.appendChild(gearIcon);
-  gear.addEventListener('click', openSettings);
+  gear.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSettings();
+  });
 
   topRow.appendChild(avatar);
   topRow.appendChild(info);
   topRow.appendChild(gear);
   el.appendChild(topRow);
+
+  el.classList.add('player-card--tappable');
+  if (!el.dataset.clickBound) {
+    el.addEventListener('click', () => {
+      if (typeof openProfile === 'function') openProfile();
+    });
+    el.dataset.clickBound = '1';
+  }
 
   // XP label
   const xpLabel = document.createElement('p');

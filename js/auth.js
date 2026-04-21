@@ -9,6 +9,9 @@ async function checkSession() {
     }
     await checkAndGrantFreeze(session.user.id);
     lucide.createIcons();
+    if (typeof checkPendingCelebration === 'function') {
+      checkPendingCelebration(session.user.id);
+    }
     return session;
   } catch (err) {
     if (DEBUG) console.error('checkSession failed', err);

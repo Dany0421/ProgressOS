@@ -14,6 +14,12 @@ async function consumeFreeze(userId, habit, prevDay) {
 
     habit.last_completed_date = prevDay;
     toast(`Streak saved with a freeze — ${data.freezes_remaining} remaining`);
+
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(userId, { type: 'freeze_consumed', meta: { habit_id: habit.id } })
+        .then(unlocks => { if (unlocks && unlocks.length) processUnlocks(userId, unlocks); });
+    }
+
     return true;
   } catch (err) {
     if (DEBUG) console.error('consumeFreeze failed', err);

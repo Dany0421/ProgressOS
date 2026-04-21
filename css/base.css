@@ -23,6 +23,15 @@
   --freeze-color:   #88CCFF;
   --freeze-glow:    rgba(136, 204, 255, 0.2);
 
+  /* Achievement rarity palette */
+  --rarity-common:         var(--accent-primary);
+  --rarity-common-glow:    var(--accent-glow);
+  --rarity-rare:           var(--xp-color);
+  --rarity-rare-glow:      var(--xp-glow);
+  --rarity-legendary:      #B57BFF;
+  --rarity-legendary-glow: rgba(181, 123, 255, 0.28);
+  --rarity-legendary-alt:  #FFD166;
+
   /* Text on accent backgrounds (FAB, primary buttons, habit-toggle on) */
   --text-on-accent: #0A0A0D;
 

@@ -401,6 +401,13 @@ async function _stopTimer() {
       toast(`+${xpEarned} XP — ${_formatMinutes(durationMinutes)}`);
     }
 
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(_userId, {
+        type: 'session_stop',
+        meta: { duration_min: durationMinutes, project_id: _activeProject.id }
+      }).then(unlocks => { if (unlocks && unlocks.length) processUnlocks(_userId, unlocks); });
+    }
+
     await _loadRecentSessions();
 
   } catch (err) {
@@ -594,6 +601,13 @@ async function _completeMilestone(ms, rowEl, rightEl) {
 
     haptic([10, 30, 10]);
     toast('Milestone complete — +40 XP');
+
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(_userId, {
+        type: 'milestone_complete',
+        meta: { project_id: _activeProject.id, milestone_id: ms.id }
+      }).then(unlocks => { if (unlocks && unlocks.length) processUnlocks(_userId, unlocks); });
+    }
 
     // Show "Complete Project" button on first milestone done
     const msData = _milestones[_activeProject.id] || { completed: 0 };
@@ -818,6 +832,13 @@ async function _completeProject() {
     _activeProject.status = 'completed';
     haptic([30, 50, 30]);
     toast('Project complete! +200 XP');
+
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(_userId, {
+        type: 'project_complete',
+        meta: { project_id: _activeProject.id }
+      }).then(unlocks => { if (unlocks && unlocks.length) processUnlocks(_userId, unlocks); });
+    }
 
     await _loadData();
     _renderDetail();

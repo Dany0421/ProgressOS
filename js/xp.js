@@ -37,10 +37,29 @@ async function awardXP(userId, amount, category, description) {
       showLevelUp(data.new_level);
     }
 
+    if (category !== 'achievement' && typeof checkAchievements === 'function') {
+      _triggerAchievementChecks(userId, amount, category, data);
+    }
+
     return data;
   } catch (err) {
     if (DEBUG) console.error('awardXP failed', err);
     toast('Could not award XP', 'error');
     return null;
+  }
+}
+
+async function _triggerAchievementChecks(userId, amount, category, data) {
+  try {
+    const triggers = [{ type: 'xp_award', meta: { amount, category } }];
+    if (data && data.bonus_crossed_250) triggers.push({ type: 'bonus_discovery' });
+    if (data && data.bonus_cap_hit)     triggers.push({ type: 'bonus_cap_hit' });
+
+    for (const t of triggers) {
+      const unlocks = await checkAchievements(userId, t);
+      if (unlocks && unlocks.length) await processUnlocks(userId, unlocks);
+    }
+  } catch (err) {
+    if (DEBUG) console.error('_triggerAchievementChecks failed', err);
   }
 }

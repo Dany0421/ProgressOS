@@ -241,6 +241,11 @@ async function _completeTask(task, cardEl) {
       _renderXPPill();
     }
 
+    if (typeof checkAchievements === 'function') {
+      checkAchievements(_userId, { type: 'task_complete', meta: { priority: task.priority } })
+        .then(unlocks => { if (unlocks && unlocks.length) processUnlocks(_userId, unlocks); });
+    }
+
     task.completed = true;
 
     if (task.recurrence && task.recurrence !== 'none') {

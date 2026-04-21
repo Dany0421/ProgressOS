@@ -101,7 +101,7 @@
   display: block;
   width: 100%;
   background: var(--accent-primary);
-  color: #0A0A0D;
+  color: var(--text-on-accent);
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   font-weight: 600;
@@ -248,7 +248,7 @@
   height: var(--fab-size);
   border-radius: 50%;
   background: var(--accent-primary);
-  color: #0A0A0D;
+  color: var(--text-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -296,9 +296,9 @@
   font-size: 13px;
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
-  color: #88CCFF;
+  color: var(--freeze-color);
   background: rgba(136, 204, 255, 0.08);
-  border: 1px solid rgba(136, 204, 255, 0.2);
+  border: 1px solid var(--freeze-glow);
   border-radius: 20px;
   padding: 5px 12px;
 }
@@ -316,7 +316,7 @@
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
-.btn-freeze:not(:disabled):active { color: #88CCFF; border-color: rgba(136, 204, 255, 0.4); }
+.btn-freeze:not(:disabled):active { color: var(--freeze-color); border-color: rgba(136, 204, 255, 0.4); }
 .btn-freeze:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* ---- Habit list ---- */
@@ -374,7 +374,7 @@
 .habit-toggle--on {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: #0A0A0D;
+  color: var(--text-on-accent);
   box-shadow: 0 0 16px var(--accent-glow);
 }
 .habit-toggle svg { width: 22px; height: 22px; }
@@ -406,14 +406,6 @@
 
 /* ---- Settings / options sheet ---- */
 .settings-content { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
-.sheet-option-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding: 4px 0 8px;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 4px;
-}
 
 /* ---- Danger outline button ---- */
 .btn-danger-outline {
@@ -609,7 +601,7 @@
   transition: transform var(--transition-fast), background var(--transition-fast);
   pointer-events: none;
 }
-.toggle-switch--on .toggle-switch-thumb { transform: translateX(20px); background: #0A0A0D; }
+.toggle-switch--on .toggle-switch-thumb { transform: translateX(20px); background: var(--text-on-accent); }
 
 .settings-stat-row {
   display: flex;
@@ -1147,7 +1139,7 @@
   max-width: 360px;
   padding: 36px 28px 32px;
   background: var(--bg-surface);
-  border: 1px solid #FF6B35;
+  border: 1px solid var(--xp-color);
   border-radius: var(--radius-card);
   box-shadow:
     0 0 60px rgba(255, 107, 53, 0.35),
@@ -1182,7 +1174,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 40px;
   font-weight: 800;
-  color: #FF6B35;
+  color: var(--xp-color);
   letter-spacing: -0.02em;
   margin: 0 0 14px;
   opacity: 0;
@@ -1235,8 +1227,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, #FF6B35 0%, #FF8C42 50%, #FF6B35 100%);
-  color: #0A0A0D;
+  background: linear-gradient(90deg, var(--xp-color) 0%, #FF8C42 50%, var(--xp-color) 100%);
+  color: var(--text-on-accent);
   font-family: 'Syne', sans-serif;
   font-size: 15px;
   font-weight: 800;

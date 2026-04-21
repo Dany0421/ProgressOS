@@ -127,7 +127,7 @@
   margin-top: 12px;
   padding: 14px 40px;
   background: var(--accent-primary);
-  color: #0A0A0D;
+  color: var(--text-on-accent);
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   font-weight: 600;

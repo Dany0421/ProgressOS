@@ -419,7 +419,6 @@ function _openAddSheet() {
     btn.className = 'priority-btn' + (r === 'none' ? ' priority-btn--active priority-btn--medium' : '');
     btn.textContent = r;
     btn.type = 'button';
-    btn.style.textTransform = 'capitalize';
     btn.addEventListener('click', () => {
       selectedRecurrence = r;
       recurGroup.querySelectorAll('.priority-btn').forEach(b => {

@@ -5,7 +5,7 @@
 ---
 
 ## Last Updated
-2026-04-22
+2026-04-21
 
 ---
 
@@ -130,6 +130,7 @@ Nenhum conhecido.
 - `consumeFreeze` e `purchaseFreeze` agora são RPCs atómicas (FOR UPDATE lock) — race condition eliminada
 - `sessionXP` linear: `Math.round(min/3)` com mínimo 5min — 15min=5, 30min=10, 1h=20
 - **Bonus Day**: ~14% chance por dia (`abs(hashtext(user_id||date)) % 7 = 0`) — cap duplica para 500, discovery overlay dispara quando cruzas 250, ribbon "MAX 500 XP" quando atinges o novo cap
+- **UI consistency audit**: tokens `--text-on-accent` (#0A0A0D) e `--freeze-color` (#88CCFF) + `--freeze-glow` adicionados em `base.css`. Todos os hardcoded hexes em components.css/animations.css substituídos por tokens. `.sheet-option-label` duplicado removido (o primeiro bloco era dead code — só o segundo renderizava). Inline `btn.style.textTransform = 'capitalize'` em `tasks.js` removido — recurrence buttons agora herdam uppercase do `.priority-btn` (consistente com LOW/MED/HIGH)
 
 ---
 

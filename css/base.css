@@ -19,6 +19,13 @@
   --xp-color:       #FF6B35;
   --xp-glow:        rgba(255, 107, 53, 0.25);
 
+  /* Freeze — ice blue */
+  --freeze-color:   #88CCFF;
+  --freeze-glow:    rgba(136, 204, 255, 0.2);
+
+  /* Text on accent backgrounds (FAB, primary buttons, habit-toggle on) */
+  --text-on-accent: #0A0A0D;
+
   /* Semantic */
   --priority-high:  #FF3B3B;
   --priority-med:   #FFB830;

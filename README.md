@@ -151,7 +151,7 @@ ProgressOS/
 ### Option 1: Try the Live Demo (No Setup)
 👉 [https://dany0421.github.io/ProgressOS/](https://dany0421.github.io/ProgressOS/)
 
-*Note: Demo uses a shared Supabase project — data may be reset. For personal use, self-host below.*
+*Note: Demo (new sign ins are off right now) uses a shared Supabase project — data may be reset. For personal use, self-host below.*
 
 ### Option 2: Self-Host with Your Supabase Project
 

@@ -18,7 +18,10 @@ Most productivity apps fail because they rely on willpower alone. ProgressOS add
 ✅ **Heatmap Dashboard** — See your momentum at a glance  
 ✅ **100% Private** — Your data stays in your Supabase project (RLS enforced)  
 
-> 🎯 Built for: developers, creators, students — anyone who wants to *feel* progress while getting things done.
+🎯 Built for: developers, creators, students — anyone who wants to *feel* progress while getting things done.
+
+🔒 **Note:** New sign-ins are currently disabled — this is a personal productivity tool for now.  
+**Want to use it?** Self-hosting takes ~10 minutes (see below) or drop a ⭐ and watch for updates!
 
 ---
 
@@ -151,7 +154,7 @@ ProgressOS/
 ### Option 1: Try the Live Demo (No Setup)
 👉 [https://dany0421.github.io/ProgressOS/](https://dany0421.github.io/ProgressOS/)
 
-*Note: Demo (new sign ins are off right now) uses a shared Supabase project — data may be reset. For personal use, self-host below.*
+*Note: Demo (note: new sign ins are off right now) uses a shared Supabase project — data may be reset. For personal use, self-host below.*
 
 ### Option 2: Self-Host with Your Supabase Project (Recommended)
 

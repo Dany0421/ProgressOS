@@ -128,6 +128,8 @@ Nenhum conhecido.
 - Freeze purchase deduz de `total_xp`, não afeta category XP pools
 - Timer persiste via `localStorage` key `progress_os_timer` — sobrevive refresh e navegação
 - `consumeFreeze` e `purchaseFreeze` agora são RPCs atómicas (FOR UPDATE lock) — race condition eliminada
+- `sessionXP` linear: `Math.round(min/3)` com mínimo 5min — 15min=5, 30min=10, 1h=20
+- **Bonus Day**: ~14% chance por dia (`abs(hashtext(user_id||date)) % 7 = 0`) — cap duplica para 500, discovery overlay dispara quando cruzas 250, ribbon "MAX 500 XP" quando atinges o novo cap
 
 ---
 

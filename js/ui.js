@@ -156,3 +156,84 @@ function showLevelUp(newLevel) {
     }, 20);
   });
 }
+
+function showBonusDay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'bonus-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+
+  const inner = document.createElement('div');
+  inner.className = 'bonus-inner';
+
+  const eyebrow = document.createElement('p');
+  eyebrow.className = 'bonus-eyebrow';
+  eyebrow.textContent = '// SYSTEM ANOMALY //';
+  inner.appendChild(eyebrow);
+
+  const title = document.createElement('p');
+  title.className = 'bonus-title';
+  title.textContent = 'BONUS DAY';
+  inner.appendChild(title);
+
+  const num = document.createElement('div');
+  num.className = 'bonus-number';
+  num.setAttribute('data-text', '500');
+  num.textContent = '500';
+  inner.appendChild(num);
+
+  const sub = document.createElement('p');
+  sub.className = 'bonus-sub';
+  sub.textContent = 'Task cap lifted for today. Go get it.';
+  inner.appendChild(sub);
+
+  overlay.appendChild(inner);
+  document.body.appendChild(overlay);
+
+  const dismiss = () => {
+    if (overlay._dismissed) return;
+    overlay._dismissed = true;
+    overlay.classList.remove('bonus-overlay--visible');
+    overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    setTimeout(() => overlay.remove(), 500);
+  };
+  overlay.addEventListener('click', dismiss);
+
+  haptic([40, 60, 40, 60, 120]);
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      overlay.classList.add('bonus-overlay--visible');
+      eyebrow.classList.add('bonus-eyebrow--typing');
+      setTimeout(() => title.classList.add('bonus-title--drop'), 450);
+      setTimeout(() => num.classList.add('bonus-number--flash'), 900);
+      setTimeout(() => sub.classList.add('bonus-sub--visible'), 1400);
+      setTimeout(dismiss, 3500);
+    }, 20);
+  });
+}
+
+function showBonusCapHit() {
+  const ribbon = document.createElement('div');
+  ribbon.className = 'bonus-burst';
+  ribbon.textContent = 'MAX — 500 XP';
+  document.body.appendChild(ribbon);
+
+  document.body.classList.add('bonus-glow');
+
+  haptic([30, 60, 30, 60, 30]);
+
+  requestAnimationFrame(() => {
+    ribbon.classList.add('bonus-burst--visible');
+  });
+
+  setTimeout(() => {
+    ribbon.classList.remove('bonus-burst--visible');
+    ribbon.addEventListener('transitionend', () => ribbon.remove(), { once: true });
+    setTimeout(() => ribbon.remove(), 500);
+  }, 1800);
+
+  setTimeout(() => document.body.classList.remove('bonus-glow'), 700);
+
+  toast('Bonus cap hit. Dopamine saturated.', 'success');
+}

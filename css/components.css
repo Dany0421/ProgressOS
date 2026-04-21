@@ -1101,3 +1101,167 @@
   letter-spacing: 0;
   font-size: 11px;
 }
+
+/* ================================================================
+   BONUS DAY — discovery overlay + cap-hit ribbon
+   Terminal-boot reveal meets slot-machine payoff. Commits to the
+   existing cyber-terminal aesthetic (scanlines, neon glow, HUD typography).
+   ================================================================ */
+
+.bonus-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 13, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 280ms ease;
+  overflow: hidden;
+}
+
+.bonus-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 107, 53, 0.04) 0px,
+    rgba(255, 107, 53, 0.04) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  animation: bonusScanlines 2.4s linear infinite;
+}
+
+.bonus-overlay--visible { opacity: 1; }
+
+.bonus-inner {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 36px 28px 32px;
+  background: var(--bg-surface);
+  border: 1px solid #FF6B35;
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 0 60px rgba(255, 107, 53, 0.35),
+    inset 0 0 40px rgba(255, 107, 53, 0.06);
+  text-align: center;
+}
+
+.bonus-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  opacity: 0;
+  margin-bottom: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  max-width: 0;
+  border-right: 2px solid var(--accent-primary);
+  vertical-align: bottom;
+}
+
+.bonus-eyebrow--typing {
+  animation:
+    bonusEyebrowReveal 600ms steps(22) forwards,
+    bonusTypeCaret 700ms step-end 600ms 3;
+}
+
+.bonus-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  color: #FF6B35;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+  opacity: 0;
+  transform: translateY(-22px);
+  text-shadow: 0 0 24px rgba(255, 107, 53, 0.55);
+}
+
+.bonus-title--drop {
+  animation: bonusDrop 560ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.bonus-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 96px;
+  font-weight: 800;
+  color: var(--accent-primary);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 10px 0 18px;
+  opacity: 0;
+  position: relative;
+}
+
+.bonus-number--flash {
+  animation:
+    bonusChromaticFlash 620ms ease-out forwards,
+    bonusGlowPulse 2.4s ease-in-out 620ms infinite;
+}
+
+.bonus-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.bonus-sub--visible { opacity: 1; }
+
+/* ---- Cap-hit ribbon (when the 500 ceiling is reached) ---- */
+.bonus-burst {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  padding-top: max(0px, env(safe-area-inset-top));
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #FF6B35 0%, #FF8C42 50%, #FF6B35 100%);
+  color: #0A0A0D;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-100%);
+  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 9998;
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.45);
+}
+
+.bonus-burst--visible { transform: translateY(0); }
+
+body.bonus-glow {
+  animation: bonusEdgeFlash 700ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bonus-overlay::before { animation: none; }
+  .bonus-number--flash {
+    animation: bonusGlowPulse 2.4s ease-in-out infinite;
+  }
+  .bonus-title--drop {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

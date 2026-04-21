@@ -163,21 +163,40 @@ declare
   v_new_level int;
   v_cumulative int := 0;
   v_i int := 2;
+  v_is_bonus boolean := false;
+  v_cap int := 250;
+  v_bonus_crossed_250 boolean := false;
+  v_bonus_cap_hit boolean := false;
 begin
   if p_category = 'tasks' then
+    v_is_bonus := (abs(hashtext(p_user_id::text || p_event_date::text)) % 7) = 0;
+    v_cap := case when v_is_bonus then 500 else 250 end;
+
     select coalesce(sum(xp_amount), 0) into v_today_tasks_xp
       from xp_events
       where user_id = p_user_id
         and category = 'tasks'
         and event_date = p_event_date;
 
-    if v_today_tasks_xp >= 250 then
-      return jsonb_build_object('awarded', 0, 'capped', true, 'leveled_up', false);
+    if v_today_tasks_xp >= v_cap then
+      return jsonb_build_object(
+        'awarded', 0, 'capped', true, 'leveled_up', false,
+        'bonus_day', v_is_bonus,
+        'bonus_cap_hit', false
+      );
     end if;
 
-    if v_today_tasks_xp + p_amount > 250 then
-      p_amount := 250 - v_today_tasks_xp;
+    if v_today_tasks_xp + p_amount > v_cap then
+      p_amount := v_cap - v_today_tasks_xp;
     end if;
+
+    v_bonus_crossed_250 := v_is_bonus
+      and v_today_tasks_xp < 250
+      and (v_today_tasks_xp + p_amount) > 250;
+
+    v_bonus_cap_hit := v_is_bonus
+      and v_today_tasks_xp < 500
+      and (v_today_tasks_xp + p_amount) >= 500;
   end if;
 
   update profiles
@@ -209,6 +228,9 @@ begin
     'new_total', v_new_total,
     'leveled_up', v_new_level > v_old_level,
     'new_level', v_new_level,
-    'old_level', v_old_level
+    'old_level', v_old_level,
+    'bonus_day', v_is_bonus,
+    'bonus_crossed_250', v_bonus_crossed_250,
+    'bonus_cap_hit', v_bonus_cap_hit
   );
 end; $$;

@@ -395,8 +395,8 @@ async function _stopTimer() {
 
     haptic([10, 30, 10]);
 
-    if (durationMinutes < 15) {
-      toast(`Session saved (${durationMinutes}min — need 15min for XP)`);
+    if (durationMinutes < 5) {
+      toast(`Session saved (${durationMinutes}min — need 5min for XP)`);
     } else {
       toast(`+${xpEarned} XP — ${_formatMinutes(durationMinutes)}`);
     }

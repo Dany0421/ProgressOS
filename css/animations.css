@@ -199,3 +199,72 @@
   transition: opacity 0.4s ease;
 }
 .onboarding-overlay--visible { opacity: 1; }
+
+/* ================================================================
+   BONUS DAY keyframes
+   ================================================================ */
+
+@keyframes bonusScanlines {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 6px; }
+}
+
+@keyframes bonusEyebrowReveal {
+  0%   { max-width: 0; opacity: 1; }
+  100% { max-width: 260px; opacity: 1; }
+}
+
+@keyframes bonusTypeCaret {
+  0%, 100% { border-right-color: var(--accent-primary); }
+  50%      { border-right-color: transparent; }
+}
+
+@keyframes bonusDrop {
+  0%   { opacity: 0; transform: translateY(-22px); }
+  60%  { opacity: 1; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bonusChromaticFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+    text-shadow:
+      -8px 0 0 rgba(255, 0, 64, 0.85),
+       8px 0 0 rgba(0, 255, 255, 0.85),
+       0 0 32px rgba(163, 255, 18, 0.0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+    text-shadow:
+      -4px 0 0 rgba(255, 0, 64, 0.55),
+       4px 0 0 rgba(0, 255, 255, 0.55),
+       0 0 40px rgba(163, 255, 18, 0.55);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    text-shadow:
+      0 0 0 rgba(255, 0, 64, 0),
+      0 0 0 rgba(0, 255, 255, 0),
+      0 0 28px rgba(163, 255, 18, 0.55);
+  }
+}
+
+@keyframes bonusGlowPulse {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(163, 255, 18, 0.4);
+  }
+  50% {
+    text-shadow:
+      0 0 40px rgba(163, 255, 18, 0.75),
+      0 0 80px rgba(255, 107, 53, 0.25);
+  }
+}
+
+@keyframes bonusEdgeFlash {
+  0%   { box-shadow: inset 0 0 0 rgba(255, 107, 53, 0); }
+  30%  { box-shadow: inset 0 0 80px rgba(255, 107, 53, 0.45); }
+  100% { box-shadow: inset 0 0 0 rgba(255, 107, 53, 0); }
+}

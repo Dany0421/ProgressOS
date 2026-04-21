@@ -101,3 +101,94 @@ begin
     'freezes_available', v_freezes + 1
   );
 end; $$;
+
+-- ============================================================
+-- 5. award_xp — now with Bonus Day mechanic
+--    ~14% chance per user per day (deterministic hash) the task cap
+--    becomes 500 instead of 250. User only discovers it when crossing 250.
+-- ============================================================
+create or replace function award_xp(
+  p_user_id uuid,
+  p_amount int,
+  p_category text,
+  p_description text,
+  p_event_date date
+) returns jsonb language plpgsql security definer as $$
+declare
+  v_today_tasks_xp int;
+  v_new_total int;
+  v_old_level int;
+  v_new_level int;
+  v_cumulative int := 0;
+  v_i int := 2;
+  v_is_bonus boolean := false;
+  v_cap int := 250;
+  v_bonus_crossed_250 boolean := false;
+  v_bonus_cap_hit boolean := false;
+begin
+  if p_category = 'tasks' then
+    v_is_bonus := (abs(hashtext(p_user_id::text || p_event_date::text)) % 7) = 0;
+    v_cap := case when v_is_bonus then 500 else 250 end;
+
+    select coalesce(sum(xp_amount), 0) into v_today_tasks_xp
+      from xp_events
+      where user_id = p_user_id
+        and category = 'tasks'
+        and event_date = p_event_date;
+
+    if v_today_tasks_xp >= v_cap then
+      return jsonb_build_object(
+        'awarded', 0, 'capped', true, 'leveled_up', false,
+        'bonus_day', v_is_bonus,
+        'bonus_cap_hit', false
+      );
+    end if;
+
+    if v_today_tasks_xp + p_amount > v_cap then
+      p_amount := v_cap - v_today_tasks_xp;
+    end if;
+
+    v_bonus_crossed_250 := v_is_bonus
+      and v_today_tasks_xp < 250
+      and (v_today_tasks_xp + p_amount) > 250;
+
+    v_bonus_cap_hit := v_is_bonus
+      and v_today_tasks_xp < 500
+      and (v_today_tasks_xp + p_amount) >= 500;
+  end if;
+
+  update profiles
+    set total_xp    = total_xp + p_amount,
+        tasks_xp    = case when p_category = 'tasks'    then tasks_xp    + p_amount else tasks_xp    end,
+        habits_xp   = case when p_category = 'habits'   then habits_xp   + p_amount else habits_xp   end,
+        projects_xp = case when p_category = 'projects' then projects_xp + p_amount else projects_xp end
+    where id = p_user_id
+    returning total_xp, current_level into v_new_total, v_old_level;
+
+  insert into xp_events (user_id, description, xp_amount, category, event_date)
+    values (p_user_id, p_description, p_amount, p_category, p_event_date);
+
+  v_new_level := 1;
+  loop
+    v_cumulative := v_cumulative + (v_i * 150);
+    exit when v_cumulative > v_new_total;
+    v_new_level := v_i;
+    v_i := v_i + 1;
+  end loop;
+
+  if v_new_level > v_old_level then
+    update profiles set current_level = v_new_level where id = p_user_id;
+  end if;
+
+  return jsonb_build_object(
+    'awarded',   p_amount,
+    'capped',    false,
+    'new_total', v_new_total,
+    'leveled_up', v_new_level > v_old_level,
+    'new_level', v_new_level,
+    'old_level', v_old_level,
+    'bonus_day', v_is_bonus,
+    'bonus_crossed_250', v_bonus_crossed_250,
+    'bonus_cap_hit', v_bonus_cap_hit
+  );
+end; $$;

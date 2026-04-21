@@ -42,9 +42,11 @@ Four tabs, one bottom nav, everything runs on the phone.
 | 7 / 30 / 100-day streak milestone | +50 / +150 / +500 |
 | Complete project milestone | +40 |
 | Complete full project | +200 |
-| Project session | +5 per 15min block (min 15min) |
+| Project session | ~1 XP per 3min (min 5min — 15min = 5 XP, 1h = 20 XP) |
 
 **Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, and project completion bonuses are exempt from the cap so rare events always feel rewarding.
+
+**Bonus Day**: roughly once a week (14% chance per day, deterministic per-user), the task cap silently doubles to **500 XP**. You only discover it when you cross 250 — the next completed task still awards XP and a full-screen "BONUS DAY" overlay fires. Pure slot-machine dopamine.
 
 **Level formula** (matches both client and server): `xpForLevel(n) = sum(i * 150) for i = 2..n`. Level 2 hits at 300 XP, Level 3 at 750, Level 4 at 1350, etc.
 

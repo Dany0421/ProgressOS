@@ -8,8 +8,8 @@ function xpForLevel(n) {
 }
 
 function sessionXP(durationMinutes) {
-  if (durationMinutes < 15) return 0;
-  return Math.floor(durationMinutes / 15) * 5;
+  if (durationMinutes < 5) return 0;
+  return Math.round(durationMinutes / 3);
 }
 
 async function awardXP(userId, amount, category, description) {
@@ -24,9 +24,13 @@ async function awardXP(userId, amount, category, description) {
     if (error) throw error;
 
     if (data.capped) {
-      toast("Daily task cap reached. You're crushing it.");
+      if (data.bonus_day) toast("Bonus cap (500) reached. Crushing it.", 'success');
+      else toast("Daily task cap reached. You're crushing it.");
       return data;
     }
+
+    if (data.bonus_crossed_250) showBonusDay();
+    if (data.bonus_cap_hit) showBonusCapHit();
 
     if (data.leveled_up) {
       playLevelUpChime();

@@ -1,351 +1,154 @@
-# ProgressOS 🎮⚡
+# ProgressOS
 
-> **Gamified productivity that actually sticks.**
+**A gamified personal productivity OS.** Tasks, habits, and code projects — with XP, levels, streaks, and a heatmap that shows you're actually moving.
 
-[🎮 Live Demo](https://dany0421.github.io/ProgressOS/) • [👁️ Vision](./VISION.md) • [📓 Session Notes](./SESSION.md)
+Built mobile-first for daily use. Dark, tactical, no fluff.
 
-*Track tasks, build habits, and level up your life — all in a clean, mobile-first interface built with vanilla JS + Supabase.*
-
----
-
-## ✨ Why ProgressOS?
-
-Most productivity apps fail because they rely on willpower alone. ProgressOS adds **meaningful gamification** to make consistency feel rewarding:
-
-✅ **XP & Levels** — Visual progress that motivates without overwhelming  
-✅ **Streaks with Freezes** — Accountability that respects real life  
-✅ **Projects with Deep Work Tracking** — Measure focus, not just completion  
-✅ **Heatmap Dashboard** — See your momentum at a glance  
-✅ **100% Private** — Your data stays in your Supabase project (RLS enforced)  
-
-🎯 Built for: developers, creators, students — anyone who wants to *feel* progress while getting things done.
-
-🔒 **Note:** New sign-ins are currently disabled — this is a personal productivity tool for now.  
-**Want to use it?** Self-hosting takes ~10 minutes (see below) or drop a ⭐ and watch for updates!
+**[Live demo](https://dany0421.github.io/ProgressOS/)** · **[Vision](./VISION.md)** · **[Session notes](./SESSION.md)**
 
 ---
 
-## 🎮 How the Gamification Works
+## Why this exists
 
-ProgressOS uses game mechanics as **motivation tools**, not distractions:
+Most productivity apps are either notebooks with badges slapped on, or games that forget you're trying to get work done. ProgressOS treats progress as something you should **see and feel** — not something buried under tabs and calendar views. Every completed task, every habit checked, every coding session — they all feed one visible number on a dashboard that rewards you for showing up.
 
-### 📊 XP System
-| Action | XP | Why it matters |
-|--------|----|---------------|
-| Complete low-priority task | +10 | Small wins count |
-| Complete high-priority task | +35 | Hard things = bigger reward |
-| Finish a habit (scheduled day) | +15 | Consistency > intensity |
-| Complete project milestone | +40 | Progress, not just perfection |
-| Finish entire project | +200 | Celebrate the big wins |
-| All tasks done today | +50 | Daily completion bonus |
-
-**Daily XP Cap**: 250 XP — prevents burnout, encourages sustainable habits.
-
-### 🔥 Streaks & Freezes
-- **Streaks** track consecutive days you complete a habit
-- **Milestones** at 7 / 30 / 100 days give bonus XP (+50 / +150 / +500)
-- **Freeze Tokens** (buy for 150 XP, max 3):
-  - Auto-consumed if you miss a day (only if streak ≥ 3)
-  - Protects your progress when life happens
-  - Strategic resource — use wisely!
-
-### 📈 Leveling Up
-```js
-// Formula: xpForLevel(n) = sum(i * 150) for i = 2 → n
-// Example: Level 2 = 300 XP, Level 3 = 750 XP total
-```
-- Level-ups trigger a celebratory animation + chime
-- Purely cosmetic — no paywalls, no locked features
-- Visual reminder: *you're growing*
+Built for people who need progress to be *visible* to stay consistent.
 
 ---
 
-## 📱 Core Features
+## What's in it
 
-### ✅ Tasks
-- CRUD with priorities (low/med/high) and due dates
-- "Carried over" logic for overdue tasks
-- Long-press → reschedule or delete
-- Filter: All / Pending / Done / Carried
-- Visual XP pill showing daily progress
+Four tabs, one bottom nav, everything runs on the phone.
 
-### 🔥 Habits
-- Schedule by day of week (Mon–Sun)
-- Streak tracking with milestone detection
-- Visual flame animation + pulse feedback
-- Freeze system integrated seamlessly
+**Dashboard** — Player card with level + XP bar, a 30-day heatmap of your momentum, today's focus (top 3 pending tasks), recent XP events, and mini stats. Settings (mute sounds, toggle haptics, logout) in a bottom sheet.
 
-### 📁 Projects
-- Organize work with categories, descriptions, status
-- Milestones with completion tracking (+40 XP each)
-- **Deep Work Timer**:
-  - Start/stop with localStorage persistence (survives refresh!)
-  - Auto-XP calculation when stopping
-  - "RUNNING" indicator on active projects
-- Notes with auto-save on blur
-- "Complete Project" button: +200 XP bonus
+**Tasks** — Daily to-dos with low/med/high priority, due dates, a daily XP counter showing your cap progress, and a "Carried Over" filter for anything you didn't finish yesterday.
 
-### 🏠 Dashboard
-- **Player Card**: Avatar, level, animated XP bar
-- **30-Day Heatmap**: Color-coded by XP earned (tap for breakdown)
-- **Today's Focus**: Top 3 incomplete tasks, completable inline
-- **XP Feed**: Last 5 events with timestamps
-- **Mini Stats**: Tasks done, active streaks, active projects
-- **Settings Sheet**: Mute sounds, toggle haptics, view stats, logout
+**Habits** — Recurring daily actions with streak tracking, milestone bonuses at 7 / 30 / 100 days, and a freeze system that auto-saves your streak if you miss a day.
 
-### 🎨 Polish & UX
-- Bottom navigation + modal sheets (mobile-optimized)
-- Toast notifications for feedback
-- Haptic patterns: `[10]` (light), `[10,30,10]` (medium), `[30,50,30]` (strong)
-- Sound effects: tick, level-up chime, milestone fanfare
-- Float XP animations (numbers that "pop" on gain)
-- Onboarding modal for first login
-- Dark/light theme via CSS variables
+**Projects** — Long-running work with milestones, a session timer (start/stop, survives page refresh), recent session log, auto-saving notes, and a manual "complete project" for the big +200 XP payoff.
 
 ---
 
-## 🛠️ Tech Stack
+## The XP system
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Frontend** | Vanilla JS (ES6+) + HTML5/CSS3 | Zero build step, fast, transparent |
-| **Backend** | Supabase (Auth + Postgres + RPC) | Real-time capable, RLS security, free tier |
-| **Icons** | Lucide (CDN, pinned v0.460.0) | Lightweight, consistent, accessible |
-| **Hosting** | GitHub Pages | Zero-config, free, CI/CD via push |
-| **Persistence** | LocalStorage + Supabase | Timer survives refresh; data synced to cloud |
+| Action | XP |
+|---|---|
+| Low-priority task | +10 |
+| Medium-priority task | +20 |
+| High-priority task | +35 |
+| All tasks done (daily bonus) | +50 |
+| Habit daily completion | +15 |
+| 7 / 30 / 100-day streak milestone | +50 / +150 / +500 |
+| Complete project milestone | +40 |
+| Complete full project | +200 |
+| Project session | +5 per 30min block (min 15min) |
 
-### 🗂️ Project Structure
+**Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, and project completion bonuses are exempt from the cap so rare events always feel rewarding.
+
+**Level formula** (matches both client and server): `xpForLevel(n) = sum(i * 150) for i = 2..n`. Level 2 hits at 300 XP, Level 3 at 750, Level 4 at 1350, etc.
+
+**Streak freezes**: 1 freeze granted automatically every 14 days (max stack of 3). Can also be bought for 150 XP each. Auto-consumed when a streak would break — but only protects streaks of 3+ days.
+
+---
+
+## Tech
+
+- **Frontend**: Vanilla JS + HTML + CSS. No frameworks, no npm, no build step.
+- **Backend**: Supabase (Postgres + Auth + RLS).
+- **Supabase JS client**: pinned to `@supabase/supabase-js@2.45.4` via CDN.
+- **Icons**: Lucide via CDN.
+- **Fonts**: Syne (display) + DM Sans (body) + JetBrains Mono (numbers), via Google Fonts.
+- **Hosting**: GitHub Pages, deployed from `main`.
+
+### Architecture notes
+
+- **Timezone-aware**: all user-facing dates are stored as local Maputo dates (UTC+2). Postgres `current_date` / `now()::date` defaults are deliberately avoided — all date columns are set explicitly from JS via `todayLocal()`.
+- **XP awards are atomic**: handled server-side by a Postgres RPC (`award_xp`) that runs cap check, increment, event log, and level-up detection in a single transaction. Prevents race conditions from rapid taps or multi-tab use.
+- **Security**: every table has RLS enabled with a `user_own_data` policy. No user can read or write another user's rows. Anon key is safe in the client; service role is never shipped.
+- **XSS-safe rendering**: all dynamic content uses `createElement` + `textContent`, never `innerHTML` with interpolation.
+
+---
+
+## Project structure
+
 ```
 ProgressOS/
-├── index.html              # Single-page app entry
-├── style.css               # CSS variables, responsive, themes
-├── js/
-│   ├── core/
-│   │   ├── auth.js         # Supabase auth flow
-│   │   ├── rpc.js          # RPC wrappers (award_xp, etc.)
-│   │   └── state.js        # Global app state
-│   ├── features/
-│   │   ├── tasks.js        # CRUD + XP logic
-│   │   ├── habits.js       # Streaks + freezes
-│   │   ├── projects.js     # Sessions + milestones
-│   │   └── dashboard.js    # Heatmap + XP feed
-│   ├── ui/
-│   │   ├── modals.js       # Bottom sheets, toasts
-│   │   ├── animations.js   # Float XP, pulse, bounce
-│   │   └── sound.js        # Haptics + audio toggles
-│   └── utils/
-│       ├── xp.js           # XP formulas, caps, formulas
-│       ├── freezes.js      # Freeze purchase/consume logic
-│       └── helpers.js      # Date utils, DOM helpers
-├── supabase/
-│   ├── schema.sql          # Tables, indexes, FKs
-│   ├── policies.sql        # RLS policies (user-isolation)
-│   └── functions.sql       # award_xp RPC (server-side logic)
-├── .env.example            # Supabase URL + anon key
-├── VISION.md               # Product philosophy
-├── SESSION.md              # Development notes & tradeoffs
-└── README.md               # You are here
+├── index.html          # Dashboard
+├── tasks.html          # Tasks page
+├── habits.html         # Habits page
+├── projects.html       # Projects page
+├── login.html          # Auth entry
+├── schema.sql          # Full DB schema + RLS + award_xp RPC
+├── css/                # base.css, components.css, animations.css
+├── js/                 # supabase, auth, time, xp, freezes, ui, sound,
+│                       # tasks, habits, projects, dashboard
+├── VISION.md           # Product spec (the source of truth)
+├── CLAUDE.md           # Working rules for Claude Code sessions
+├── SESSION.md          # Current build state, roadmap, open questions
+└── README.md           # This file
 ```
 
 ---
 
-## 🚀 Get Started
+## Self-hosting
 
-### Option 1: Try the Live Demo (No Setup)
-👉 [https://dany0421.github.io/ProgressOS/](https://dany0421.github.io/ProgressOS/)
+Want your own instance? ~10 minutes.
 
-*Note: Demo (note: new sign ins are off right now) uses a shared Supabase project — data may be reset. For personal use, self-host below.*
+### 1. Create a Supabase project
 
-### Option 2: Self-Host with Your Supabase Project (Recommended)
+[supabase.com](https://supabase.com) → New project. Region: closest to you. Grab the **Project URL** and **anon public key** from Settings → API.
 
-#### 1. Create a Supabase Project
-- Go to [supabase.com](https://supabase.com) → New Project
-- Note your **Project URL** and **anon public key**
+### 2. Run the schema
 
-#### 2. Clone & Configure
+Supabase dashboard → SQL Editor → paste the contents of [`schema.sql`](./schema.sql) → Run. This creates all tables, indexes, RLS policies, and the `award_xp` RPC in one go.
+
+### 3. Create your user
+
+Authentication → Users → Add user (enable "Auto Confirm"). Then Table Editor → `profiles` → Insert row with `id` = your auth user UUID, `username` = whatever you want.
+
+### 4. Configure auth URLs
+
+Authentication → URL Configuration. Add your local dev URL (e.g. `http://127.0.0.1:5500/**`) and your GitHub Pages URL (e.g. `https://yourname.github.io/ProgressOS/**`) to Redirect URLs. The `**` matters.
+
+### 5. Clone + configure
+
 ```bash
 git clone https://github.com/Dany0421/ProgressOS.git
 cd ProgressOS
-cp .env.example .env
-# Edit .env with your Supabase credentials:
-VITE_SUPABASE_URL=your_project_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-#### 3. Run Database Migrations
-In Supabase Dashboard → SQL Editor:
-```sql
--- Run these in order:
--- 1. supabase/schema.sql (creates tables)
--- 2. supabase/policies.sql (enables RLS)
--- 3. supabase/functions.sql (adds award_xp RPC)
-```
-
-#### 4. Open Locally
-```bash
-# Option A: Simple HTTP server
-python3 -m http.server 8000
-# Then visit: http://localhost:8000
-
-# Option B: VS Code Live Server extension
-# Right-click index.html → "Open with Live Server"
-```
-
-#### 5. Sign Up & Go!
-- First login triggers onboarding
-- Your data is isolated via Row Level Security (RLS)
-- Start tracking, earning XP, leveling up 🎉
-
----
-
-## 🗄️ Database Schema Overview
-
-### Core Tables
-| Table | Purpose | Key Fields |
-|-------|---------|-----------|
-| `profiles` | User metadata | id, username, avatar_url, level, total_xp |
-| `tasks` | Todo items | id, user_id, title, priority, due_date, status |
-| `habits` | Recurring habits | id, user_id, name, active_days[], streak_count |
-| `habit_logs` | Daily completions | habit_id, date, completed |
-| `projects` | Long-term work | id, user_id, title, category, status, description |
-| `milestones` | Project sub-goals | project_id, title, completed, xp_reward |
-| `project_sessions` | Deep work tracking | project_id, start_time, end_time, xp_awarded |
-| `xp_events` | Audit log of all XP gains | user_id, amount, source, timestamp |
-| `freeze_tokens` | Streak protection | user_id, purchased_at, consumed_at |
-
-### 🔐 Security: Row Level Security (RLS)
-All tables enforce:
-```sql
--- Example: tasks table policy
-CREATE POLICY "Users can only access their own tasks"
-ON tasks FOR ALL
-USING (auth.uid() = user_id);
-```
-→ Your data is **never** visible to other users.
-
-### ⚙️ Server-Side Logic: `award_xp` RPC
-```sql
--- Called from frontend: award_xp(user_id, amount, source)
--- Handles:
--- • Daily XP cap enforcement (250 max)
--- • Level-up detection & notification
--- • XP event logging
--- • Transactional safety (all-or-nothing)
-```
-→ Keeps game logic secure and consistent.
-
----
-
-## ⚙️ Configuration & Customization
-
-### 🎮 XP Values (Edit in `js/utils/xp.js`)
+Open `js/supabase.js` and paste your Supabase URL + anon key:
 ```js
-export const XP_VALUES = {
-  task: { low: 10, medium: 20, high: 35 },
-  habit: 15,
-  milestone: 40,
-  project_complete: 200,
-  all_tasks_done: 50,
-  streak: { 7: 50, 30: 150, 100: 500 }
-};
-export const DAILY_XP_CAP = 250;
+const SUPABASE_URL = 'https://xxx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJ...';
 ```
 
-### ❄️ Freeze Logic (Edit in `js/utils/freezes.js`)
-```js
-export const FREEZE_CONFIG = {
-  cost: 150,          // XP to buy one
-  max_owned: 3,       // Max freezes a user can hold
-  min_streak_to_use: 3 // Only auto-consume if streak ≥ 3
-};
-```
+### 6. Run it
 
-### 🔊 Sound & Haptics
-- Toggle in Settings sheet
-- Haptic patterns defined in `js/ui/sound.js`
-- Sounds use Web Audio API (no external dependencies)
+Any static server works. Easiest:
+- **VS Code Live Server** — right-click `login.html` → Open with Live Server
+- **Python** — `python3 -m http.server 5500` and open `http://127.0.0.1:5500/login.html`
 
-### 🐛 DEBUG Mode
-Add `?debug=true` to URL or set:
-```js
-// In js/core/state.js
-export const DEBUG = true; // Enables verbose console logging
-```
+Log in with the credentials you set in step 3. Done.
 
 ---
 
-## 🤝 Contributing
+## Design
 
-ProgressOS is open source and built to be forked. Here's how to help:
+Dark theme, cyber-terminal aesthetic. Acid lime (`#A3FF12`) for primary actions and XP bars. Fire orange (`#FF6B35`) for XP numbers, streaks, and reward moments. Backgrounds in dark neutrals (`#0A0A0D` to `#1C1C26`) with glow borders on active elements rather than flat shadows.
 
-### 🐛 Report Issues
-- Use GitHub Issues with: steps to reproduce, expected vs actual, browser/device info
-- Bonus: include console logs if `?debug=true`
+Motion: short haptic ticks on task complete, ascending chime on level-up, floating XP numbers on every gain. Everything tuned for a phone in your hand — not a desktop viewport.
 
-### 💡 Suggest Features
-- Keep scope in mind: MVP first, polish later
-- Ask: "Does this help someone *feel* progress?"
-- Use Discussions for early ideas before coding
-
-### 🛠️ Code Contributions
-1. Fork + create feature branch
-2. Follow existing patterns: modular JS, CSS variables, mobile-first
-3. Test RLS policies if touching backend logic
-4. Add comments for non-obvious XP/streak math
-5. PR with clear description + screenshots if UI changed
-
-### 🎨 Design Feedback
-- Accessibility: color contrast, tap targets, screen reader labels
-- Motion: reduce animations if `prefers-reduced-motion`
-- Theming: CSS variables make dark/light easy — test both!
+See [`VISION.md`](./VISION.md) for the full design token system and motion spec.
 
 ---
 
-## 🐛 Known Limitations (MVP Tradeoffs)
+## License
 
-| Limitation | Why | Workaround / Future |
-|-----------|-----|---------------------|
-| ❌ No offline support | Supabase client requires network | Service worker planned for v2 |
-| ❌ Single-user only | RLS isolates data, but no multi-account UI | Could add org/team support later |
-| ❌ Completed projects stay visible | No archive view yet | Add "Archive" filter + bulk actions |
-| ⚠️ `consumeFreeze` not atomic | Race condition if 2 tabs open | Move to RPC in next iteration |
-| ⚠️ No loading skeletons | Fetches are fast; added complexity later | Add skeleton screens for slower networks |
-
-*See [SESSION.md](./SESSION.md) for full development notes.*
+MIT. Fork it, tweak it, make it yours.
 
 ---
 
-## 📄 License
-
-**MIT License** — Do whatever you want with this code.
-
-> Fork it. Tweak the XP values. Add your own features. Make it yours.  
-> Just don't blame me if you get *too* addicted to leveling up. 😉
-
----
-
-## 🌟 Support the Project
-
-If ProgressOS helps you ship more, build better, or just feel good about checking boxes:
-
-⭐ **Star this repo** — helps others find it  
-🐛 **Report bugs** — makes it better for everyone  
-💬 **Share your setup** — how do *you* use ProgressOS?  
-🔄 **Fork and customize** — make the productivity OS *you* need  
-
----
-
-## 📧 Contact
-
-- **Repo**: https://github.com/Dany0421/ProgressOS  
-- **Demo**: https://dany0421.github.io/ProgressOS/  
-- **Issues**: https://github.com/Dany0421/ProgressOS/issues  
-- **Discussions**: https://github.com/Dany0421/ProgressOS/discussions  
-
----
-
-> **VibeCoded using vanilla JavaScript + Supabase**  
-> *No frameworks. No build step. No nonsense.*  
-> *— Dany*  
-
-*Version: 1.0.0 • Last updated: 21.04.2026*
+Vibe-coded in vanilla JS + Supabase. No frameworks. No build step. No nonsense.
+— Dany

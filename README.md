@@ -153,7 +153,7 @@ ProgressOS/
 
 *Note: Demo (new sign ins are off right now) uses a shared Supabase project — data may be reset. For personal use, self-host below.*
 
-### Option 2: Self-Host with Your Supabase Project
+### Option 2: Self-Host with Your Supabase Project (Recommended)
 
 #### 1. Create a Supabase Project
 - Go to [supabase.com](https://supabase.com) → New Project

@@ -138,6 +138,12 @@ function _createEmptyState() {
   return el;
 }
 
+function _nextDueDate(recurrence) {
+  const d = new Date(todayLocal() + 'T12:00:00');
+  d.setDate(d.getDate() + (recurrence === 'weekly' ? 7 : 1));
+  return d.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+}
+
 function _createTaskCard(task) {
   const today = todayLocal();
   const isCarried = !task.completed && task.due_date < today;
@@ -190,6 +196,13 @@ function _createTaskCard(task) {
   priority.textContent = task.priority;
   metaRow.appendChild(priority);
 
+  if (task.recurrence && task.recurrence !== 'none') {
+    const recBadge = document.createElement('span');
+    recBadge.className = 'badge badge--recurring';
+    recBadge.textContent = task.recurrence === 'daily' ? '↻ daily' : '↻ weekly';
+    metaRow.appendChild(recBadge);
+  }
+
   if (!task.completed) {
     const xpEl = document.createElement('span');
     xpEl.className = 'task-xp mono';
@@ -230,8 +243,20 @@ async function _completeTask(task, cardEl) {
 
     task.completed = true;
 
+    if (task.recurrence && task.recurrence !== 'none') {
+      const nextDate = _nextDueDate(task.recurrence);
+      await supabase.from('tasks').insert({
+        user_id:    _userId,
+        title:      task.title,
+        priority:   task.priority,
+        recurrence: task.recurrence,
+        due_date:   nextDate
+      });
+    }
+
     setTimeout(async () => {
       await _checkAllDoneBonus();
+      await _loadTasks();
       _renderFilterBar();
       _renderTasks();
     }, 700);
@@ -380,6 +405,31 @@ function _openAddSheet() {
     priorityGroup.appendChild(btn);
   });
 
+  const recurLabel = document.createElement('p');
+  recurLabel.className = 'form-label';
+  recurLabel.textContent = 'Recurrence';
+
+  const recurGroup = document.createElement('div');
+  recurGroup.className = 'priority-group';
+
+  let selectedRecurrence = 'none';
+
+  ['none', 'daily', 'weekly'].forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'priority-btn' + (r === 'none' ? ' priority-btn--active priority-btn--medium' : '');
+    btn.textContent = r;
+    btn.type = 'button';
+    btn.style.textTransform = 'capitalize';
+    btn.addEventListener('click', () => {
+      selectedRecurrence = r;
+      recurGroup.querySelectorAll('.priority-btn').forEach(b => {
+        b.classList.remove('priority-btn--active', 'priority-btn--medium');
+      });
+      btn.classList.add('priority-btn--active', 'priority-btn--medium');
+    });
+    recurGroup.appendChild(btn);
+  });
+
   const submitBtn = document.createElement('button');
   submitBtn.className = 'btn-primary';
   submitBtn.type = 'button';
@@ -390,7 +440,7 @@ function _openAddSheet() {
     if (!title) { titleInput.focus(); return; }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Adding...';
-    await _addTask(title, selectedPriority);
+    await _addTask(title, selectedPriority, selectedRecurrence);
     hideBottomSheet();
   });
 
@@ -402,18 +452,21 @@ function _openAddSheet() {
   content.appendChild(titleInput);
   content.appendChild(priorityLabel);
   content.appendChild(priorityGroup);
+  content.appendChild(recurLabel);
+  content.appendChild(recurGroup);
   content.appendChild(submitBtn);
 
   showBottomSheet(content, 'New Task');
   setTimeout(() => titleInput.focus(), 350);
 }
 
-async function _addTask(title, priority) {
+async function _addTask(title, priority, recurrence = 'none') {
   try {
     const { error } = await supabase.from('tasks').insert({
       user_id: _userId,
       title,
       priority,
+      recurrence,
       due_date: todayLocal()
     });
     if (error) throw error;

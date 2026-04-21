@@ -3,7 +3,8 @@ var DEBUG = false;
 var _habits = [];
 var _userId = null;
 var _profile = null;
-var _selectedDow = null; // day-of-week filter; null until init
+var _selectedDow = null;
+var _logsMap = {}; // { habitId: Set<date_string> } for last 7 days
 
 document.addEventListener('DOMContentLoaded', async () => {
   const session = await checkSession();
@@ -23,14 +24,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function _loadData() {
-  const [habitsRes, profileRes] = await Promise.all([
+  const sixDaysAgo = nDaysAgoLocal(6);
+  const [habitsRes, profileRes, logsRes] = await Promise.all([
     supabase.from('habits').select('*').eq('user_id', _userId).order('created_at', { ascending: true }),
-    supabase.from('profiles').select('freezes_available, total_xp').eq('id', _userId).single()
+    supabase.from('profiles').select('freezes_available, total_xp').eq('id', _userId).single(),
+    supabase.from('habit_logs').select('habit_id, completed_date').eq('user_id', _userId).gte('completed_date', sixDaysAgo)
   ]);
   if (habitsRes.error) throw habitsRes.error;
   if (profileRes.error) throw profileRes.error;
+  if (logsRes.error) throw logsRes.error;
   _habits = habitsRes.data || [];
   _profile = profileRes.data;
+
+  _logsMap = {};
+  (logsRes.data || []).forEach(log => {
+    if (!_logsMap[log.habit_id]) _logsMap[log.habit_id] = new Set();
+    _logsMap[log.habit_id].add(log.completed_date);
+  });
 }
 
 async function _checkStreaks() {
@@ -208,6 +218,29 @@ function _createHabitCard(habit) {
     milestones.appendChild(badge);
   });
   body.appendChild(milestones);
+
+  // 7-day sparkline
+  const sparkline = document.createElement('div');
+  sparkline.className = 'habit-sparkline';
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today + 'T12:00:00');
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+    const isToday = (i === 0);
+    const done = (_logsMap[habit.id] && _logsMap[habit.id].has(dateStr)) || (isToday && isDone);
+    const dot = document.createElement('span');
+    dot.className = 'spark-dot' + (done ? ' spark-dot--done' : '') + (isToday ? ' spark-dot--today' : '');
+    sparkline.appendChild(dot);
+  }
+  body.appendChild(sparkline);
+
+  if (habit.longest_streak > 0) {
+    const best = document.createElement('p');
+    best.className = 'habit-best mono';
+    best.textContent = `best: ${habit.longest_streak}d`;
+    body.appendChild(best);
+  }
+
   card.appendChild(body);
 
   const right = document.createElement('div');
@@ -279,6 +312,12 @@ async function _completeHabit(habit, cardEl, toggleEl, rightEl) {
     habit.last_completed_date = today;
     habit.current_streak = newStreak;
     habit.longest_streak = newLongest;
+
+    // Keep logsMap + sparkline in sync without re-render
+    if (!_logsMap[habit.id]) _logsMap[habit.id] = new Set();
+    _logsMap[habit.id].add(today);
+    const todayDot = cardEl.querySelector('.spark-dot--today');
+    if (todayDot) todayDot.classList.add('spark-dot--done');
 
     toggleEl.classList.add('habit-toggle--on');
     toggleEl.textContent = '';
@@ -487,11 +526,11 @@ function _activeDaysLabel(days) {
 async function _buyFreeze() {
   if (_profile.total_xp < 150 || _profile.freezes_available >= 3) return;
 
-  const ok = await purchaseFreeze(_userId, _profile.total_xp, _profile.freezes_available);
-  if (!ok) { toast('Could not purchase freeze', 'error'); return; }
+  const result = await purchaseFreeze(_userId);
+  if (!result) return; // error toast already shown inside purchaseFreeze
 
-  _profile.total_xp -= 150;
-  _profile.freezes_available += 1;
+  _profile.total_xp = result.new_balance;
+  _profile.freezes_available = result.freezes_available;
 
   toast(`Freeze purchased — ${_profile.freezes_available}/3 available`);
   haptic(15);

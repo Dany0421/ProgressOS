@@ -1,10 +1,11 @@
 var DEBUG = false;
 
 var _projects = [];
-var _milestones = {}; // { projectId: { total, completed, list[] } }
+var _milestones = {};
 var _userId = null;
 var _activeProject = null;
 var _timerInterval = null;
+var _projectFilter = 'active_paused'; // 'active_paused' | 'completed'
 
 const TIMER_KEY = 'progress_os_timer';
 
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     await _loadData();
+    _renderProjectFilter();
     _renderList();
     _wireFAB();
     _wireBack();
@@ -49,29 +51,55 @@ async function _loadData() {
 
 // ---- List view ----
 
+function _renderProjectFilter() {
+  const bar = document.getElementById('project-filter-bar');
+  if (!bar) return;
+  bar.textContent = '';
+
+  const tabs = [
+    { key: 'active_paused', label: 'Active', count: _projects.filter(p => p.status !== 'completed').length },
+    { key: 'completed',     label: 'Completed', count: _projects.filter(p => p.status === 'completed').length }
+  ];
+
+  tabs.forEach(tab => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (_projectFilter === tab.key ? ' filter-btn--active' : '');
+    btn.textContent = tab.count > 0 ? `${tab.label} (${tab.count})` : tab.label;
+    btn.addEventListener('click', () => {
+      _projectFilter = tab.key;
+      _renderProjectFilter();
+      _renderList();
+    });
+    bar.appendChild(btn);
+  });
+}
+
 function _renderList() {
   const list = document.getElementById('project-list');
   if (!list) return;
   list.textContent = '';
 
   const timer = _getRunningTimer();
+  const filtered = _projectFilter === 'completed'
+    ? _projects.filter(p => p.status === 'completed')
+    : _projects.filter(p => p.status !== 'completed');
 
-  if (_projects.length === 0) {
+  if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     const title = document.createElement('p');
     title.className = 'empty-state-title';
-    title.textContent = 'No projects yet.';
+    title.textContent = _projectFilter === 'completed' ? 'No completed projects.' : 'No projects yet.';
     const sub = document.createElement('p');
     sub.className = 'empty-state-sub';
-    sub.textContent = 'Start building.';
+    sub.textContent = _projectFilter === 'completed' ? 'Complete one to see it here.' : 'Start building.';
     empty.appendChild(title);
     empty.appendChild(sub);
     list.appendChild(empty);
     return;
   }
 
-  _projects.forEach(p => list.appendChild(_createProjectCard(p, timer)));
+  filtered.forEach(p => list.appendChild(_createProjectCard(p, timer)));
   lucide.createIcons();
 }
 
@@ -209,7 +237,7 @@ function _closeDetail() {
 
   _activeProject = null;
 
-  _loadData().then(() => _renderList()).catch(() => {});
+  _loadData().then(() => { _renderProjectFilter(); _renderList(); }).catch(() => {});
 }
 
 function _wireBack() {

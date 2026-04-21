@@ -29,6 +29,7 @@ create table if not exists tasks (
   completed_at timestamptz,
   due_date date,
   xp_awarded integer default 0,
+  recurrence text check (recurrence in ('none', 'daily', 'weekly')) default 'none',
   created_at timestamptz default now()
 );
 create index if not exists tasks_user_due on tasks(user_id, due_date);
@@ -44,8 +45,6 @@ create table if not exists habits (
   active_days integer[] default '{0,1,2,3,4,5,6}',  -- 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
   created_at timestamptz default now()
 );
--- If table already exists, run this separately:
--- ALTER TABLE habits ADD COLUMN IF NOT EXISTS active_days integer[] DEFAULT '{0,1,2,3,4,5,6}';
 
 create table if not exists habit_logs (
   id uuid primary key default gen_random_uuid(),
@@ -100,7 +99,7 @@ create table if not exists xp_events (
   user_id uuid references profiles(id) on delete cascade,
   description text not null,
   xp_amount integer not null,
-  category text check (category in ('tasks', 'habits', 'projects', 'bonus', 'system')),
+  category text check (category in ('tasks', 'habits', 'projects', 'bonus', 'system', 'spend')),
   event_date date not null,
   created_at timestamptz default now()
 );

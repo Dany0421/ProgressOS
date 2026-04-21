@@ -1054,3 +1054,50 @@
   transition: background var(--transition-fast);
 }
 .btn-complete-project:active { background: rgba(163,255,18,0.2); }
+
+/* ---- Habit sparkline (7-day) ---- */
+.habit-sparkline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.spark-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.spark-dot--done {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 4px var(--accent-glow);
+}
+
+.spark-dot--today {
+  width: 8px;
+  height: 8px;
+}
+
+.habit-best {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* ---- Recurring task badge ---- */
+.badge--recurring {
+  color: var(--accent-primary);
+  background: rgba(163, 255, 18, 0.08);
+  border: 1px solid rgba(163, 255, 18, 0.2);
+  font-family: 'DM Sans', sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}

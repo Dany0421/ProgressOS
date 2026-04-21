@@ -9,7 +9,7 @@ function xpForLevel(n) {
 
 function sessionXP(durationMinutes) {
   if (durationMinutes < 15) return 0;
-  return Math.floor(durationMinutes / 30) * 5;
+  return Math.floor(durationMinutes / 15) * 5;
 }
 
 async function awardXP(userId, amount, category, description) {

@@ -22,11 +22,11 @@ Four tabs, one bottom nav, everything runs on the phone.
 
 **Dashboard** — Player card with level + XP bar, a 30-day heatmap of your momentum, today's focus (top 3 pending tasks), recent XP events, and mini stats. Settings (mute sounds, toggle haptics, logout) in a bottom sheet.
 
-**Tasks** — Daily to-dos with low/med/high priority, due dates, a daily XP counter showing your cap progress, and a "Carried Over" filter for anything you didn't finish yesterday.
+**Tasks** — Daily to-dos with low/med/high priority, due dates, a daily XP counter showing your cap progress, a "Carried Over" filter for anything you didn't finish yesterday, and optional **daily/weekly recurrence** — completing a recurring task automatically spawns the next instance.
 
-**Habits** — Recurring daily actions with streak tracking, milestone bonuses at 7 / 30 / 100 days, and a freeze system that auto-saves your streak if you miss a day.
+**Habits** — Recurring daily actions with streak tracking, milestone bonuses at 7 / 30 / 100 days, a freeze system that auto-saves your streak if you miss a day, a **7-day sparkline** per habit, and your **best streak** shown underneath.
 
-**Projects** — Long-running work with milestones, a session timer (start/stop, survives page refresh), recent session log, auto-saving notes, and a manual "complete project" for the big +200 XP payoff.
+**Projects** — Long-running work with milestones, a session timer (start/stop, survives page refresh), recent session log, auto-saving notes, a manual "complete project" for the big +200 XP payoff, and an **Active / Completed** tab split so finished work archives cleanly.
 
 ---
 
@@ -42,7 +42,7 @@ Four tabs, one bottom nav, everything runs on the phone.
 | 7 / 30 / 100-day streak milestone | +50 / +150 / +500 |
 | Complete project milestone | +40 |
 | Complete full project | +200 |
-| Project session | +5 per 30min block (min 15min) |
+| Project session | +5 per 15min block (min 15min) |
 
 **Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, and project completion bonuses are exempt from the cap so rare events always feel rewarding.
 
@@ -64,7 +64,7 @@ Four tabs, one bottom nav, everything runs on the phone.
 ### Architecture notes
 
 - **Timezone-aware**: all user-facing dates are stored as local Maputo dates (UTC+2). Postgres `current_date` / `now()::date` defaults are deliberately avoided — all date columns are set explicitly from JS via `todayLocal()`.
-- **XP awards are atomic**: handled server-side by a Postgres RPC (`award_xp`) that runs cap check, increment, event log, and level-up detection in a single transaction. Prevents race conditions from rapid taps or multi-tab use.
+- **XP awards are atomic**: handled server-side by a Postgres RPC (`award_xp`) that runs cap check, increment, event log, and level-up detection in a single transaction. Prevents race conditions from rapid taps or multi-tab use. Freeze consume/purchase use the same pattern (`consume_freeze`, `purchase_freeze`) with `FOR UPDATE` row locking.
 - **Security**: every table has RLS enabled with a `user_own_data` policy. No user can read or write another user's rows. Anon key is safe in the client; service role is never shipped.
 - **XSS-safe rendering**: all dynamic content uses `createElement` + `textContent`, never `innerHTML` with interpolation.
 
@@ -78,8 +78,8 @@ ProgressOS/
 ├── tasks.html          # Tasks page
 ├── habits.html         # Habits page
 ├── projects.html       # Projects page
-├── login.html          # Auth entry
-├── schema.sql          # Full DB schema + RLS + award_xp RPC
+├── login.html          # Auth entry (login / sign up / reset password)
+├── sql/                # schema.sql (tables + RLS + award_xp) + functions.sql (freeze RPCs, migrations)
 ├── css/                # base.css, components.css, animations.css
 ├── js/                 # supabase, auth, time, xp, freezes, ui, sound,
 │                       # tasks, habits, projects, dashboard
@@ -101,7 +101,7 @@ Want your own instance? ~10 minutes.
 
 ### 2. Run the schema
 
-Supabase dashboard → SQL Editor → paste the contents of [`schema.sql`](./schema.sql) → Run. This creates all tables, indexes, RLS policies, and the `award_xp` RPC in one go.
+Supabase dashboard → SQL Editor → paste the contents of [`sql/schema.sql`](./sql/schema.sql) → Run. This creates all tables, indexes, RLS policies, and the `award_xp` RPC in one go. Then run [`sql/functions.sql`](./sql/functions.sql) for the freeze RPCs (`consume_freeze`, `purchase_freeze`).
 
 ### 3. Create your user
 

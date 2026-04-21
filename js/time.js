@@ -27,6 +27,12 @@ function todayDayOfWeek() {
   return new Date(todayLocal() + 'T12:00:00').getDay();
 }
 
+function nDaysAgoLocal(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+}
+
 // Returns the most recent date before today where day-of-week is in activeDays
 function prevScheduledDate(activeDays) {
   for (let i = 1; i <= 7; i++) {

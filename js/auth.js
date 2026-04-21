@@ -69,36 +69,144 @@ if (window.location.pathname.endsWith('login.html') || window.location.pathname 
 
     lucide.createIcons();
 
-    const form = document.getElementById('login-form');
-    const btn = document.getElementById('login-btn');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
+    function _showAuthView(id) {
+      document.querySelectorAll('.auth-view').forEach(el => {
+        el.classList.add('auth-view--hidden');
+        el.classList.remove('auth-view--entering');
+      });
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.classList.remove('auth-view--hidden');
+      void target.offsetWidth;
+      target.classList.add('auth-view--entering');
+    }
 
-    if (!form) return;
+    function _buildSuccess(view, titleText, subText, btnText, onBack) {
+      view.textContent = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'auth-success';
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+      const iconEl = document.createElement('span');
+      iconEl.className = 'auth-success-icon';
+      iconEl.textContent = '✓';
 
-      if (!email || !password) {
-        toast('Enter your email and password', 'error');
-        return;
-      }
+      const titleEl = document.createElement('p');
+      titleEl.className = 'auth-success-title';
+      titleEl.textContent = titleText;
 
-      btn.disabled = true;
-      btn.textContent = 'Logging in...';
+      const subEl = document.createElement('p');
+      subEl.className = 'auth-success-sub';
+      subEl.textContent = subText;
 
-      try {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        window.location.href = 'index.html';
-      } catch (err) {
-        if (DEBUG) console.error('login failed', err);
-        toast(err.message || 'Login failed', 'error');
-        btn.disabled = false;
-        btn.textContent = 'Log in';
-      }
+      const backBtn = document.createElement('button');
+      backBtn.className = 'login-btn';
+      backBtn.type = 'button';
+      backBtn.textContent = btnText;
+      backBtn.addEventListener('click', onBack);
+
+      wrap.appendChild(iconEl);
+      wrap.appendChild(titleEl);
+      wrap.appendChild(subEl);
+      wrap.appendChild(backBtn);
+      view.appendChild(wrap);
+    }
+
+    document.querySelectorAll('.btn-eye').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        if (!input) return;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        const icon = btn.querySelector('i[data-lucide]');
+        if (icon) {
+          icon.setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+          lucide.createIcons();
+        }
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      });
     });
+
+    const loginForm = document.getElementById('login-form');
+    const loginBtn  = document.getElementById('login-btn');
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email    = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        if (!email || !password) { toast('Enter your email and password', 'error'); return; }
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Logging in...';
+        try {
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          window.location.href = 'index.html';
+        } catch (err) {
+          if (DEBUG) console.error('login failed', err);
+          toast(err.message || 'Login failed', 'error');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Log in';
+        }
+      });
+    }
+
+    document.getElementById('btn-show-signup')?.addEventListener('click', () => _showAuthView('view-signup'));
+    document.getElementById('btn-show-forgot')?.addEventListener('click', () => _showAuthView('view-reset'));
+    document.getElementById('btn-back-signup')?.addEventListener('click', () => _showAuthView('view-login'));
+    document.getElementById('btn-back-reset')?.addEventListener('click',  () => _showAuthView('view-login'));
+
+    const signupForm = document.getElementById('signup-form');
+    const signupBtn  = document.getElementById('signup-btn');
+
+    if (signupForm) {
+      signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email    = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirm  = document.getElementById('signup-confirm').value;
+        if (!email || !password) { toast('Fill in all fields', 'error'); return; }
+        if (password.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+        if (password !== confirm) { toast('Passwords do not match', 'error'); return; }
+        signupBtn.disabled = true;
+        signupBtn.textContent = 'Creating account...';
+        try {
+          const { error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          const view = document.getElementById('view-signup');
+          if (view) _buildSuccess(view, 'Check your email', 'We sent a confirmation link. Open it to activate your account.', 'Back to login', () => window.location.reload());
+        } catch (err) {
+          if (DEBUG) console.error('signup failed', err);
+          toast(err.message || 'Could not create account', 'error');
+          signupBtn.disabled = false;
+          signupBtn.textContent = 'Create account';
+        }
+      });
+    }
+
+    const resetForm = document.getElementById('reset-form');
+    const resetBtn  = document.getElementById('reset-btn');
+
+    if (resetForm) {
+      resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value.trim();
+        if (!email) { toast('Enter your email', 'error'); return; }
+        resetBtn.disabled = true;
+        resetBtn.textContent = 'Sending...';
+        try {
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/login.html'
+          });
+          if (error) throw error;
+          const view = document.getElementById('view-reset');
+          if (view) _buildSuccess(view, 'Check your email', 'We sent a reset link. Follow it to set a new password.', 'Back to login', () => window.location.reload());
+        } catch (err) {
+          if (DEBUG) console.error('resetPassword failed', err);
+          toast(err.message || 'Could not send reset email', 'error');
+          resetBtn.disabled = false;
+          resetBtn.textContent = 'Send reset link';
+        }
+      });
+    }
   });
 }

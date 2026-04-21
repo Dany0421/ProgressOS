@@ -5,7 +5,7 @@
 ---
 
 ## Last Updated
-2026-04-21
+2026-04-22
 
 ---
 
@@ -76,6 +76,20 @@
 - [x] XP Feed (last 5 events)
 - [x] FAB for quick task add
 
+### Phase 9 — Bugs, Data Integrity & Features ✅
+- [x] **functions.sql** criado — correr no Supabase antes de usar as novas features
+- [x] `consume_freeze` RPC atómica: lock profiles, decrementa, actualiza habit + habit_logs + xp_events
+- [x] `purchase_freeze` RPC atómica: lock profiles, valida XP (≥150) + cap (≤3), deduz + incrementa
+- [x] `freezes.js` refactorizado para usar ambas as RPCs (sem race conditions)
+- [x] `xp_events.category` — adicionado `'spend'` para freeze purchase (ALTER TABLE em functions.sql)
+- [x] `sessionXP` bug fixado: `Math.floor(d/15)*5` (era `/30`, 16min dava 0 XP)
+- [x] Projects — Archive View: tabs "Active" e "Completed", filter client-side
+- [x] Auth flows — Sign Up + Forgot Password no `login.html` (3 views com fade animation)
+- [x] Password show/hide toggle em todos os campos de password
+- [x] Recurring tasks: `recurrence` column em tasks (none/daily/weekly), selector no add sheet, badge na card, next instance criada automaticamente no complete
+- [x] Habit sparkline: 7 dots dos últimos 7 dias (verde = feito), atualiza in-place no complete
+- [x] Habit "best streak": mostra `longest_streak` abaixo do sparkline
+
 ### Phase 8 — Polish ✅
 - [x] Onboarding modal on first login (3 pillars, "Let's go." button)
 - [x] Task long-press → reschedule / delete
@@ -113,14 +127,14 @@ Nenhum conhecido.
 - Heatmap popup mostra breakdown por categoria (tasks/habits/projects/bonus)
 - Freeze purchase deduz de `total_xp`, não afeta category XP pools
 - Timer persiste via `localStorage` key `progress_os_timer` — sobrevive refresh e navegação
-- `consumeFreeze` é um read-then-write (não atómico) — risco de race condition em dois tabs, aceite para MVP
+- `consumeFreeze` e `purchaseFreeze` agora são RPCs atómicas (FOR UPDATE lock) — race condition eliminada
 
 ---
 
 ## Tech Debt / Future
 
 - Sem loading skeletons nos fetches (aceite para MVP)
-- `consumeFreeze` não é atómico — se dois tabs abrirem ao mesmo tempo podem consumir 2 freezes para o mesmo habit
+- Recurring tasks não têm edit — se quiser mudar o tipo de recorrência tem de apagar e recriar
 - Sem suporte offline
 - Sem multi-user (single-user only)
 - Completed projects ficam na lista com badge "completed" — sem arquivo separado

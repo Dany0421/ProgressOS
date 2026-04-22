@@ -11,9 +11,15 @@
 
 ## Project Status
 
-**Phase**: Phase 10 — Achievements shipped
+**Phase**: Phase 11 — Match Day Vibe (mid-build — backend + Events list shipped, UI layers pending)
 
-**Current focus**: Achievements system live. 36 badges across 7 categories, atomic check/backfill RPCs, Profile + Gallery views, 3-tier unlock overlays. Backfill ran for Dany: 4 unlocks (title-initiate, first-bonus, cap-breaker legendary, trinity-day), +625 XP, level 2 → 3. Phone-tested Profile + Gallery + legendary celebration. All working.
+**Current focus**: Match Day Vibe V1 — manual-entry Barça/F1 events, theme skin on event day, prediction mechanic with XP rewards. Backend + Events list view done and phone-tested (Phases 0 + 1 of the implementation plan). Next session picks up with Phase 2 — Match detail page (4-state slide-in with editable predictions form).
+
+**This session also shipped**: Change Username feature (Profile name tappable + pencil icon → bottom sheet → update + case-insensitive unique index on DB). Fully phone-tested and working.
+
+**Plan/spec location** (both gitignored per Dany's preference):
+- Spec: `docs/specs/2026-04-22-match-day-vibe-design.md`
+- Impl plan: `docs/superpowers/plans/2026-04-22-match-day-vibe.md`
 
 ---
 
@@ -114,11 +120,65 @@
 
 **Total: 36 achievements** — 7 XP/Level, 5 Streak, 7 Volume, 4 Rare, 4 Trinity, 8 Archetype (hidden, all titles), 1 baseline Title (Initiate).
 
+### Change Username feature ✅
+- [x] Profile view: `<h2 class="profile-name">` tappable + pencil Lucide icon → bottom sheet "Change username"
+- [x] Validation: 3–30 chars, trim, rejects empty/whitespace; same-username submit closes silently
+- [x] DB: unique case-insensitive partial index `profiles_username_unique_ci on profiles (lower(username)) where username is not null` — handles "Dany" vs "dany" collisions
+- [x] Error mapping: Postgres error code `23505` → toast "Username already taken"; network/other → generic "Could not update username"
+- [x] Post-update: `_profileState.profile.username` updated in memory, `_renderProfileView()` re-renders, `_refreshPlayerCardAfterProfile` extended to refetch `username` alongside `active_title` — player-card updates on profile close
+
+### Phase 11 — Match Day Vibe 🛠 (MID-BUILD)
+
+**Spec**: `docs/specs/2026-04-22-match-day-vibe-design.md` (gitignored)
+**Plan**: `docs/superpowers/plans/2026-04-22-match-day-vibe.md` (gitignored, 11 phases: 0–10)
+
+**Phase 0 — Backend ✅ (applied to DB via MCP)**
+- [x] `sql/match-day.sql` created + applied via `apply_migration`
+- [x] 3 tables: `events` / `event_predictions` / `event_results` + RLS (`user_own_data`)
+- [x] RPCs: `_maputo_today()`, `set_f1_team(p_user_id, p_team)`, `settle_event(p_event_id, p_result jsonb)` — atomic settlement, cap-exempt XP via `award_xp('prediction', ...)`
+- [x] 4 new achievement rows: `pred-first` (common +25), `pred-clasico` (rare +100), `pred-perfect-podium` (rare +100), `pred-oracle` (legendary +500) — total achievements now **40**
+- [x] `profiles.f1_team` column added (nullable text, enum-validated in RPC)
+- [x] `xp_events.category` check constraint now allows `'prediction'` + `'system'` restored (see Known Bugs below — restored because the match-day migration accidentally dropped it)
+- [x] Mirror in `sql/schema.sql` for fresh installs
+
+**Phase 1 — Event CRUD + Events list view ✅ (phone-tested)**
+- [x] `js/events.js` — `fetchUpcomingEvents`, `fetchPastEvents`, `fetchTodayEvents`, `fetchEventWithPrediction`, `createEvent`, `savePrediction` (upsert on `event_id`), `deleteEvent`, `settleEvent` (RPC wrapper), `isPredictionLocked(event)`, `canSettle(event)` (kickoff+90min), `minutesSinceKickoff(event)`
+- [x] `js/events-view.js` — slide-in pane (`.events-view`, z-index 965), Upcoming + Past sections, long-press (600ms) → `_openEventOptionsSheet` (delete via bottom sheet, NOT native confirm), FAB for new event
+- [x] Event create flow: sport picker sheet (FOOTBALL / F1) → sport-specific form. Football fields: home_status pill (HOME/AWAY/NEUTRAL), opponent, competition, optional custom_label, date, kickoff_time. F1 fields: gp_name, date, kickoff_time
+- [x] `css/match-day.css` — events list, FAB, event rows, sport picker, settings-nav-row style
+- [x] Settings bottom sheet on dashboard has new "Events" row (between stats and Logout) → opens events view
+- [x] Body scroll lock while events view open (`document.body.style.overflow = 'hidden'` + restore on close) + `overscroll-behavior: contain`
+- [x] Phone-tested: create football event, create F1 event, list renders with right icons, long-press → options sheet → delete works, navigation closes clean
+
+**NOT YET COMMITTED** — Dany wants one commit for Phase 0 + 1 together when we resume and everything is validated.
+
+**Pending — start here next session: Phase 2 — Match detail page (editable state)**
+
+Steps in plan file (follow exactly):
+- 2.1: Scaffold `js/match-detail.js` with `openMatchDetail(eventId)` / `closeMatchDetail()` + 4-state dispatcher (PRE-GAME / LIVE / SETTLE / SETTLED)
+- 2.2: `_renderHero(event, result)` — competition badge, team crests (Barça gradient + gold border / opponent muted), match meta line (`🏠 HOME · TODAY 21:00`), chequered separator
+- 2.3: `_renderFootballSection(state, event, prediction, result)` — editable/locked/verdict rows (score input pair, winner pills, first scorer team pills, first scorer name text input). Reuses `.priority-btn` pattern with `--active` modifier — don't forget the non-semantic active CSS override (see Known Bugs below)
+- 2.4: `_renderFooter` + `_savePredictionsFromDOM(event)` — SAVE PREDICTIONS button (orange gradient) calls `savePrediction()` → refetch + rerender
+- 2.5: `_renderF1Section` — 4 text inputs (P1/P2/P3/fastest_lap) + optional rain_pct number
+- 2.6: CSS block for match view + predictions + footer + `<script src="js/match-detail.js">` in `index.html`
+
+After Phase 2 → phone-test: open events list → tap row → match detail slide-in with PRE-GAME form → save → persists → reopen after kickoff → LIVE state (red pulsing, locked).
+
+**Subsequent phases (each = phone-test gate + commit):**
+- Phase 3: dashboard widget (single event, no carousel yet)
+- Phase 4: settlement + XP (reconciliation sheet with "You predicted: X" inline)
+- Phase 5: theme skin activation (blaugrana body.match-day, F1 palette map)
+- Phase 6: F1 team picker in Profile
+- Phase 7: carousel for multiple same-day events (scroll-snap + dots)
+- Phase 8: nudges for past unsettled events (7-day window)
+- Phase 9: extend `check_achievements` RPC for `event_created` + `prediction_perfect` triggers
+- Phase 10: next-up widget variant + README/SESSION docs update
+
 ---
 
 ## In Progress 🛠
 
-Nothing in progress. App is complete.
+Phase 11 — Match Day Vibe — mid-build. Phase 0 + 1 done (backend + Events list). Resume at Phase 2 (match detail page). Uncommitted file changes: `sql/match-day.sql` (new), `sql/schema.sql` (appended), `js/events.js` (new), `js/events-view.js` (new), `css/match-day.css` (new), `index.html` (added 2 scripts + 1 CSS link), `js/dashboard.js` (settings Events row).
 
 ---
 
@@ -130,7 +190,11 @@ Nenhuma.
 
 ## Known Bugs 🐛
 
-Nenhum conhecido.
+**Resolved this session (keep as memory for pattern):**
+- **CSS token name mismatch** — `css/match-day.css` initially used `--bg-primary`, which doesn't exist in `base.css`. Correct token is `--bg-base`. Symptom: events-view had no background, dashboard scrolled through. Fix applied. Lesson: check `base.css` tokens before writing new CSS files.
+- **Accidentally dropped `'system'` from `xp_events.category` check constraint** — my first draft of `match-day.sql` rewrote the check without `'system'`, which is used by `sql/functions.sql:60` (freeze consume logging). Applied migration broke freeze logs silently. Fix: restored `'system'` via emergency `apply_migration`, corrected both `sql/match-day.sql` and `sql/schema.sql`. Lesson: before any `alter constraint` that rewrites an allowlist, grep the codebase for each existing value.
+- **`.priority-btn--active` without a `--low/--medium/--high` modifier has no visual change** — tasks.js styles active state via compound selectors like `.priority-btn--medium.priority-btn--active`. Reusing just `.priority-btn` + `.priority-btn--active` makes buttons appear unresponsive (they are receiving clicks, but look identical). Fix in `css/match-day.css`: added override `.sheet-form .priority-btn.priority-btn--active:not(.priority-btn--low):not(.priority-btn--medium):not(.priority-btn--high) { ... acid lime highlight ... }`.
+- **`confirm()` native prompt is ugly** — Dany doesn't want Windows-style alerts. Replaced long-press delete with a custom bottom-sheet options pattern (same as `_openTaskOptions` in tasks.js — shows the event title + red "Delete event" button).
 
 ---
 
@@ -150,6 +214,12 @@ Nenhum conhecido.
 - **Achievements — recursion guard**: `xp.js._triggerAchievementChecks` não roda quando `category === 'achievement'`. Sem isso, o XP award de um achievement dispararia outro check → loop infinito se cascateasse com level-up.
 - **Achievements — fire-and-forget hooks**: todas as chamadas a `checkAchievements` nos action handlers (tasks/habits/projects/freezes) usam `.then()`, não `await`. UI nunca bloqueia à espera da RPC.
 - **Player-card listener idempotency**: `dashboard._renderPlayerCard` re-renderiza quando voltas do Profile. `textContent = ''` não remove listeners do próprio `el` — sem guard, cada re-render empilhava outro handler. Fix: `dataset.clickBound` flag.
+- **Change Username — case-insensitive uniqueness via DB**: no `SELECT` de outros usernames via RLS → decidimos usar `create unique index ... on profiles (lower(username)) where username is not null` e apanhar o erro `23505` no cliente como "Username already taken". Atómico, zero race window, zero RPC extra.
+- **Match Day Vibe V1 — manual entry only**: validar o vibe antes de investir em APIs externas (football-data, ergast, openweathermap). V2 adiciona auto-detection por cima.
+- **Match Day Vibe — cap-exempt `'prediction'` category**: prediction XP awards não contam para o daily task cap, mesma pattern que `'achievement'`.
+- **Match Day Vibe — theme skin all-day ligado à existência de today-event**: não há lógica de timers / janelas. Se há evento hoje e ainda não está 100% settled, tema ligado. Simplificação V1 — decay 3h pós-settlement deferred para V2.
+- **Match Day Vibe — "self" vs "opponent" semantics**: schema usa `pred_self_score` / `pred_opponent_score` (e.g. Barça vs adversário), decoupled do `home_status` do evento. Evita confusão entre "home=Barça joga em casa" vs "home=equipa da casa do jogo".
+- **Match Day Vibe — spec/plan in `docs/`**: Dany adicionou `docs/` ao gitignore. Specs + plans ficam locais, não vão para o repo. Diferente do default da skill de brainstorming (que comita tudo).
 
 ---
 

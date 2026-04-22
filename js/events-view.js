@@ -60,6 +60,7 @@ function _renderEventsView({ upcoming, past }) {
 
   document.body.appendChild(view);
   if (window.lucide) lucide.createIcons();
+  document.body.style.overflow = 'hidden';
   requestAnimationFrame(() => view.classList.add('view--visible'));
 }
 
@@ -116,18 +117,22 @@ function _renderEventRow(ev) {
     row.appendChild(badge);
   }
 
-  row.addEventListener('click', () => {
+  let longPressed = false;
+  let pressTimer = null;
+  const clearTimer = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+
+  row.addEventListener('click', (e) => {
+    if (longPressed) { longPressed = false; e.preventDefault(); return; }
     if (typeof openMatchDetail === 'function') openMatchDetail(ev.id);
   });
 
-  let pressTimer = null;
-  const clearTimer = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
   row.addEventListener('pointerdown', () => {
+    longPressed = false;
     pressTimer = setTimeout(() => {
       pressTimer = null;
-      if (confirm('Delete this event?')) {
-        deleteEvent(ev.id).then(ok => { if (ok) openEventsView(); });
-      }
+      longPressed = true;
+      if (navigator.vibrate) navigator.vibrate(20);
+      _openEventOptionsSheet(ev);
     }, 600);
   });
   row.addEventListener('pointerup', clearTimer);
@@ -137,12 +142,37 @@ function _renderEventRow(ev) {
   return row;
 }
 
+function _openEventOptionsSheet(ev) {
+  const content = document.createElement('div');
+  content.className = 'settings-content';
+
+  const name = document.createElement('p');
+  name.className = 'sheet-option-label';
+  name.textContent = ev.sport === 'football'
+    ? 'Barça vs ' + (ev.opponent || '—')
+    : (ev.gp_name || 'F1 event');
+  content.appendChild(name);
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn-danger-outline';
+  delBtn.textContent = 'Delete event';
+  delBtn.addEventListener('click', async () => {
+    const ok = await deleteEvent(ev.id);
+    hideBottomSheet();
+    if (ok) openEventsView();
+  });
+  content.appendChild(delBtn);
+
+  showBottomSheet(content, 'Event options');
+}
+
 function closeEventsView() {
   if (!_eventsViewEl) return;
   _eventsViewEl.classList.remove('view--visible');
   const el = _eventsViewEl;
   el.addEventListener('transitionend', () => {
     if (el.parentNode) el.parentNode.removeChild(el);
+    document.body.style.overflow = '';
   }, { once: true });
   _eventsViewEl = null;
 }
@@ -219,7 +249,7 @@ function _openFootballForm() {
   form.appendChild(venueLabel);
 
   const venueRow = document.createElement('div');
-  venueRow.className = 'priority-row';
+  venueRow.className = 'priority-group';
   let selectedVenue = 'home';
   ['home','away','neutral'].forEach(v => {
     const b = document.createElement('button');

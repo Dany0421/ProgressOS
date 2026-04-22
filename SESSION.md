@@ -150,7 +150,7 @@
 - [x] Body scroll lock while events view open (`document.body.style.overflow = 'hidden'` + restore on close) + `overscroll-behavior: contain`
 - [x] Phone-tested: create football event, create F1 event, list renders with right icons, long-press → options sheet → delete works, navigation closes clean
 
-**NOT YET COMMITTED** — Dany wants one commit for Phase 0 + 1 together when we resume and everything is validated.
+**Committed** — Phase 0 + 1 already on main (commits: `Phase 1 - Events`, `Fix Events page`, `Fix`, `Last fix phase 1`, `Update SESSION.md`).
 
 **Pending — start here next session: Phase 2 — Match detail page (editable state)**
 
@@ -178,7 +178,7 @@ After Phase 2 → phone-test: open events list → tap row → match detail slid
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phase 0 + 1 done (backend + Events list). Resume at Phase 2 (match detail page). Uncommitted file changes: `sql/match-day.sql` (new), `sql/schema.sql` (appended), `js/events.js` (new), `js/events-view.js` (new), `css/match-day.css` (new), `index.html` (added 2 scripts + 1 CSS link), `js/dashboard.js` (settings Events row).
+Phase 11 — Match Day Vibe — mid-build. Phase 0 + 1 done + committed. Resume at Phase 2 (match detail page — `js/match-detail.js`, hero + football/F1 sections + footer, plus CSS block in `css/match-day.css`).
 
 ---
 

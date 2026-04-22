@@ -1,0 +1,90 @@
+/* ============================================================
+ * Match Day Vibe — styles
+ * Phase 1: events list view + FAB + event rows + sport picker
+ * ============================================================ */
+
+/* ---- Events list view ---- */
+.events-view {
+  position: fixed; inset: 0;
+  background: var(--bg-primary);
+  z-index: 965;
+  transform: translateX(100%);
+  transition: transform 260ms ease;
+  overflow-y: auto;
+  padding-bottom: 90px;
+}
+.events-view.view--visible { transform: translateX(0); }
+.events-body { padding: 16px; display: flex; flex-direction: column; gap: 22px; }
+
+.events-section { display: flex; flex-direction: column; gap: 10px; }
+.events-section-heading {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+}
+.events-empty { color: var(--text-muted); font-size: 13px; }
+
+.event-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+}
+.event-row-icon { color: var(--accent-primary); width: 20px; height: 20px; }
+.event-row-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.event-row-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+.event-row-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; }
+.event-row-badge {
+  font-size: 9px; letter-spacing: 0.18em;
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+  padding: 3px 6px; border-radius: 4px;
+}
+
+.events-fab {
+  position: fixed; bottom: 90px; right: 20px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent-primary); color: var(--text-on-accent);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px var(--accent-glow);
+  z-index: 966;
+  cursor: pointer;
+}
+
+/* Settings nav row (Events entry) */
+.settings-nav-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: inherit; font-size: 13px;
+  text-align: left; cursor: pointer;
+}
+.settings-nav-row:active { border-color: var(--accent-primary); }
+.settings-nav-label { flex: 1; }
+.settings-nav-row i { color: var(--accent-primary); width: 18px; height: 18px; }
+.settings-nav-chev { color: var(--text-muted) !important; }
+
+/* Sport picker inside create sheet */
+.sport-picker-row { display: flex; gap: 10px; margin-top: 4px; }
+.sport-pick {
+  flex: 1; padding: 18px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; letter-spacing: 0.14em;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.sport-pick:active { border-color: var(--accent-primary); }

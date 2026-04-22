@@ -510,6 +510,34 @@ function openSettings() {
 
   content.appendChild(statsSection);
 
+  // Events entry
+  const navSection = document.createElement('div');
+  navSection.className = 'settings-section';
+
+  const eventsRow = document.createElement('button');
+  eventsRow.className = 'settings-nav-row';
+  eventsRow.type = 'button';
+  const eventsIcon = document.createElement('i');
+  eventsIcon.setAttribute('data-lucide', 'calendar');
+  eventsRow.appendChild(eventsIcon);
+  const eventsLabel = document.createElement('span');
+  eventsLabel.className = 'settings-nav-label';
+  eventsLabel.textContent = 'Events';
+  eventsRow.appendChild(eventsLabel);
+  const eventsChev = document.createElement('i');
+  eventsChev.setAttribute('data-lucide', 'chevron-right');
+  eventsChev.className = 'settings-nav-chev';
+  eventsRow.appendChild(eventsChev);
+  eventsRow.addEventListener('click', () => {
+    hideBottomSheet();
+    setTimeout(() => {
+      if (typeof openEventsView === 'function') openEventsView();
+    }, 200);
+  });
+  navSection.appendChild(eventsRow);
+
+  content.appendChild(navSection);
+
   // Logout
   const danger = document.createElement('div');
   danger.className = 'settings-danger';

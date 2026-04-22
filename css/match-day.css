@@ -77,6 +77,14 @@
 .settings-nav-row i { color: var(--accent-primary); width: 18px; height: 18px; }
 .settings-nav-chev { color: var(--text-muted) !important; }
 
+/* Generic priority-btn active state (for match-day forms using the pill pattern
+   without the low/medium/high semantic — e.g. HOME/AWAY/NEUTRAL in football create). */
+.sheet-form .priority-btn.priority-btn--active:not(.priority-btn--low):not(.priority-btn--medium):not(.priority-btn--high) {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+}
+
 /* Sport picker inside create sheet */
 .sport-picker-row { display: flex; gap: 10px; margin-top: 4px; }
 .sport-pick {

@@ -192,3 +192,10 @@ begin
     'bonus_cap_hit', v_bonus_cap_hit
   );
 end; $$;
+
+-- ============================================================
+-- Username: case-insensitive unique index
+-- ============================================================
+create unique index if not exists profiles_username_unique_ci
+  on profiles (lower(username))
+  where username is not null;

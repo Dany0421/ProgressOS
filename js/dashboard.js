@@ -80,10 +80,11 @@ async function _refreshPlayerCardAfterProfile() {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('active_title')
+      .select('active_title, username')
       .eq('id', _userId).single();
     if (error) throw error;
     _profile.active_title = data.active_title;
+    _profile.username = data.username;
     _activeTitleName = null;
     if (data.active_title) {
       const { data: ach } = await supabase.from('achievements').select('name').eq('id', data.active_title).single();

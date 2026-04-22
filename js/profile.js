@@ -113,10 +113,27 @@ function _renderHero() {
   avatar.textContent = (profile.username || 'U').charAt(0).toUpperCase();
   hero.appendChild(avatar);
 
+  const nameRow = document.createElement('div');
+  nameRow.className = 'profile-name-row';
+
   const name = document.createElement('h2');
   name.className = 'profile-name';
   name.textContent = profile.username || 'Player';
-  hero.appendChild(name);
+  nameRow.appendChild(name);
+
+  const editBtn = document.createElement('button');
+  editBtn.className = 'profile-name-edit-btn';
+  editBtn.type = 'button';
+  editBtn.setAttribute('aria-label', 'Change username');
+  const editIcon = document.createElement('i');
+  editIcon.setAttribute('data-lucide', 'pencil');
+  editBtn.appendChild(editIcon);
+  editBtn.addEventListener('click', _openUsernameSheet);
+  nameRow.appendChild(editBtn);
+
+  name.addEventListener('click', _openUsernameSheet);
+
+  hero.appendChild(nameRow);
 
   // Active title (if any)
   const activeTitleId = profile.active_title;
@@ -164,6 +181,80 @@ function _renderHero() {
   requestAnimationFrame(() => setTimeout(() => { fill.style.width = `${pct}%`; }, 30));
 
   return hero;
+}
+
+function _openUsernameSheet() {
+  if (!_profileState) return;
+  const current = _profileState.profile.username || '';
+
+  const form = document.createElement('div');
+  form.className = 'sheet-form';
+
+  const label = document.createElement('label');
+  label.className = 'form-label';
+  label.setAttribute('for', 'username-input');
+  label.textContent = 'Username';
+  form.appendChild(label);
+
+  const input = document.createElement('input');
+  input.className = 'form-input';
+  input.type = 'text';
+  input.id = 'username-input';
+  input.placeholder = '3 to 30 characters';
+  input.maxLength = 30;
+  input.autocomplete = 'off';
+  input.value = current;
+  form.appendChild(input);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.className = 'btn-primary';
+  submitBtn.type = 'button';
+  submitBtn.textContent = 'Save';
+  form.appendChild(submitBtn);
+
+  const submit = async () => {
+    const value = (input.value || '').trim();
+    if (value === current) { hideBottomSheet(); return; }
+    if (value.length < 3 || value.length > 30) {
+      toast('Username must be 3–30 characters', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    try {
+      const { error } = await supabase.from('profiles')
+        .update({ username: value })
+        .eq('id', _profileState.userId);
+
+      if (error) {
+        if (error.code === '23505') {
+          toast('Username already taken', 'error');
+        } else {
+          toast('Could not update username', 'error');
+          if (DEBUG) console.error('username update failed', error);
+        }
+        submitBtn.disabled = false;
+        return;
+      }
+
+      _profileState.profile.username = value;
+      hideBottomSheet();
+      toast('Username updated');
+      _renderProfileView();
+    } catch (err) {
+      if (DEBUG) console.error('username update threw', err);
+      toast('Could not update username', 'error');
+      submitBtn.disabled = false;
+    }
+  };
+
+  submitBtn.addEventListener('click', submit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); submit(); }
+  });
+
+  showBottomSheet(form, 'Change username');
+  setTimeout(() => { input.focus(); input.select(); }, 100);
 }
 
 function _renderStatsGrid() {

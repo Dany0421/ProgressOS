@@ -1562,12 +1562,38 @@ body.bonus-glow {
   margin-bottom: 14px;
   box-shadow: 0 0 32px var(--accent-glow);
 }
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
 .profile-name {
   font-family: 'Syne', sans-serif;
   font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
   text-align: center;
+  cursor: pointer;
+}
+.profile-name-edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 180ms ease;
+}
+.profile-name-edit-btn:hover,
+.profile-name-edit-btn:active {
+  color: var(--accent-primary);
+}
+.profile-name-edit-btn i {
+  width: 14px;
+  height: 14px;
 }
 .profile-title-label {
   font-size: 11px;

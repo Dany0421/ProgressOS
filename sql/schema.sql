@@ -20,6 +20,10 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
+create unique index if not exists profiles_username_unique_ci
+  on profiles (lower(username))
+  where username is not null;
+
 create table if not exists tasks (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,

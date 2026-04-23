@@ -28,7 +28,9 @@ Four tabs, one bottom nav, everything runs on the phone.
 
 **Projects** — Long-running work with milestones, a session timer (start/stop, survives page refresh), recent session log, auto-saving notes, a manual "complete project" for the big +200 XP payoff, and an **Active / Completed** tab split so finished work archives cleanly.
 
-**Profile + Achievements** — Tap the player card to open a Profile view with big stats (Total XP, days active, tasks / habits / projects done, best streak) and a **Titles** row: unlock archetype achievements to earn titles that show under your name. From there, the **Achievements Gallery** lists 36 badges across 7 categories (XP, Streak, Volume, Rare, Trinity, Archetype, Title) with common / rare / legendary rarities. Unlock animations are tiered — toast for common, mini-modal for rare, fullscreen celebration for legendary. Hidden archetype badges stay as `???` until discovered.
+**Profile + Achievements** — Tap the player card to open a Profile view with big stats (Total XP, days active, tasks / habits / projects done, best streak) and a **Titles** row: unlock archetype achievements to earn titles that show under your name. From there, the **Achievements Gallery** lists 40 badges across 7 categories (XP, Streak, Volume, Rare, Trinity, Archetype, Title) with common / rare / legendary rarities. Unlock animations are tiered — toast for common, mini-modal for rare, fullscreen celebration for legendary. Hidden archetype badges stay as `???` until discovered.
+
+**Beta Player** — The first 10 people to sign up receive a permanent **Beta Player** legendary title (+250 XP). No action needed — it's awarded automatically on sign-up.
 
 ---
 

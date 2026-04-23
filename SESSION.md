@@ -218,6 +218,7 @@ Nenhuma.
 - **Match Day Vibe V1 — manual entry only**: validar o vibe antes de investir em APIs externas (football-data, ergast, openweathermap). V2 adiciona auto-detection por cima.
 - **Match Day Vibe — cap-exempt `'prediction'` category**: prediction XP awards não contam para o daily task cap, mesma pattern que `'achievement'`.
 - **Match Day Vibe — theme skin all-day ligado à existência de today-event**: não há lógica de timers / janelas. Se há evento hoje e ainda não está 100% settled, tema ligado. Simplificação V1 — decay 3h pós-settlement deferred para V2.
+- **Beta Player title** — legendary title (`beta-player`), +250 XP, `is_title true`. Auto-awarded via trigger `trg_beta_player_on_signup` on `profiles` INSERT when total profile count ≤ 11 (first 10 real users). Not in `check_achievements` — manually seeded for existing users, trigger handles new ones.
 - **Match Day Vibe — "self" vs "opponent" semantics**: schema usa `pred_self_score` / `pred_opponent_score` (e.g. Barça vs adversário), decoupled do `home_status` do evento. Evita confusão entre "home=Barça joga em casa" vs "home=equipa da casa do jogo".
 - **Match Day Vibe — spec/plan in `docs/`**: Dany adicionou `docs/` ao gitignore. Specs + plans ficam locais, não vão para o repo. Diferente do default da skill de brainstorming (que comita tudo).
 

@@ -20,7 +20,7 @@ function _renderMatchDetail() {
   const { event, prediction, result } = _matchState;
 
   const view = document.createElement('div');
-  view.className = 'match-view';
+  view.className = 'match-view match-view--' + _matchState.event.sport;
   view.id = 'match-view';
   _matchViewEl = view;
 

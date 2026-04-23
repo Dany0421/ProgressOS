@@ -214,3 +214,22 @@
 .match-btn--live { background: rgba(255,59,48,0.15); border: 1px solid #FF3B30; color: #FF3B30; }
 .match-btn--settle { background: linear-gradient(90deg, #A50044, #004D98); color: #fff; border: 1px solid #FFD166; }
 .match-btn--settled { background: rgba(163,255,18,0.1); border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+
+/* F1 sport overrides — replace Barça palette with F1 red */
+.match-view--f1 {
+  background:
+    radial-gradient(ellipse at top right, rgba(232, 0, 45, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(180, 180, 180, 0.08) 0%, transparent 55%),
+    var(--bg-base);
+}
+.match-view--f1 .match-comp-badge {
+  background: linear-gradient(90deg, #E8002D, #1a1a1a);
+  border-color: #C0C0C0;
+}
+.match-view--f1 .match-sep {
+  background: repeating-linear-gradient(45deg, #E8002D 0 4px, transparent 4px 8px);
+}
+.match-view--f1 .match-btn--settle {
+  background: linear-gradient(90deg, #E8002D, #1a1a1a);
+  border-color: #C0C0C0;
+}

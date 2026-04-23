@@ -40,7 +40,7 @@ function _renderMatchDetail() {
   header.appendChild(title);
   view.appendChild(header);
 
-  view.appendChild(_renderHero(event, result));
+  view.appendChild(_renderMatchHero(event, result));
 
   const locked = isPredictionLocked(event);
   const settleable = canSettle(event);
@@ -82,7 +82,7 @@ function _destroyMatchDetail() {
 
 // ---- Hero ----
 
-function _renderHero(event, result) {
+function _renderMatchHero(event, result) {
   const hero = document.createElement('div');
   hero.className = 'match-hero';
 

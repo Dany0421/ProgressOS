@@ -85,14 +85,8 @@ function _renderProfileView() {
 
   // Hero
   view.appendChild(_renderHero());
-
-  // Stats grid
   view.appendChild(_renderStatsGrid());
-
-  // Titles row
   view.appendChild(_renderTitlesRow());
-
-  // Achievements progress + button
   view.appendChild(_renderAchievementsCta());
 
   document.body.appendChild(view);

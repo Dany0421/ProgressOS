@@ -492,5 +492,6 @@ values
   ('pred-first',          'First Prediction', 'Create your first match event.',                 'rare', 'common',    25, false, false, 'flag'),
   ('pred-clasico',        'Clásico Called',   'Nail every field of a Clásico prediction.',      'rare', 'rare',     100, false, false, 'trophy'),
   ('pred-perfect-podium', 'Perfect Podium',   'Predict an F1 podium top-3 in exact order.',     'rare', 'rare',     100, false, false, 'award'),
-  ('pred-oracle',         'The Oracle',       'Nail 10 perfect predictions.',                   'rare', 'legendary',500, false, false, 'sparkles')
+  ('pred-oracle',         'The Oracle',       'Nail 10 perfect predictions.',                   'rare', 'legendary',500, false, false, 'sparkles'),
+  ('beta-player',         'Beta Player',      'Founding member of ProgressOS — one of the first 10.', 'rare', 'legendary', 250, true, false, 'rocket')
 on conflict (id) do nothing;

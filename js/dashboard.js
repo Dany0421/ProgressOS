@@ -5,7 +5,6 @@ var _userEmail = null;
 var _profile = null;
 var _xpEvents = [];
 var _focusTasks = [];
-var _pendingMarginProjects = [];
 var _stats = { tasksDone: 0, activeStreaks: 0, activeProjects: 0 };
 var _activeTitleName = null;
 
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     _renderPlayerCard();
     _renderStats();
     _renderHeatmap();
-    _renderPendingMarginAlerts();
     _renderFocus();
     _renderFeed();
     _wireFAB();
@@ -37,14 +35,13 @@ async function _loadAll() {
   const today = todayLocal();
   const thirtyDaysAgo = _daysAgo(29);
 
-  const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes, pendingMarginRes] = await Promise.all([
+  const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes] = await Promise.all([
     supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title').eq('id', _userId).single(),
     supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('completed', true).eq('due_date', today),
     supabase.from('habits').select('*', { count: 'exact', head: true }).eq('user_id', _userId).gt('current_streak', 0),
     supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('status', 'active'),
     supabase.from('xp_events').select('event_date, xp_amount, category, description, created_at').eq('user_id', _userId).gte('event_date', thirtyDaysAgo).order('created_at', { ascending: false }),
-    supabase.from('tasks').select('*').eq('user_id', _userId).eq('completed', false).lte('due_date', today).order('due_date'),
-    supabase.from('projects').select('id, title, pending_margin_since, last_followup_at').eq('user_id', _userId).eq('status', 'pending_margin')
+    supabase.from('tasks').select('*').eq('user_id', _userId).eq('completed', false).lte('due_date', today).order('due_date')
   ]);
 
   if (profileRes.error) throw profileRes.error;
@@ -54,12 +51,6 @@ async function _loadAll() {
   _stats.tasksDone = tasksDoneRes.count || 0;
   _stats.activeStreaks = streaksRes.count || 0;
   _stats.activeProjects = projectsRes.count || 0;
-
-  const cutoff24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  _pendingMarginProjects = (pendingMarginRes.data || []).filter(p => {
-    const ref = p.last_followup_at || p.pending_margin_since;
-    return ref && ref < cutoff24h;
-  });
 
   _activeTitleName = null;
   if (_profile.active_title) {
@@ -323,62 +314,6 @@ function _showHeatmapPopup(dateStr, totalXP) {
 }
 
 // ---- Today's Focus ----
-
-function _renderPendingMarginAlerts() {
-  const section = document.getElementById('pending-margin-section');
-  if (!section) return;
-  section.textContent = '';
-
-  if (_pendingMarginProjects.length === 0) return;
-
-  const heading = document.createElement('h2');
-  heading.className = 'dashboard-section-title';
-  heading.textContent = 'Pending Margin';
-  section.appendChild(heading);
-
-  const list = document.createElement('div');
-  list.className = 'pending-margin-list';
-
-  _pendingMarginProjects.forEach(project => {
-    const row = document.createElement('div');
-    row.className = 'pending-margin-row';
-
-    const name = document.createElement('span');
-    name.className = 'pending-margin-name';
-    name.textContent = project.title;
-    row.appendChild(name);
-
-    const doneBtn = document.createElement('button');
-    doneBtn.className = 'btn-followup-done';
-    doneBtn.textContent = 'Done follow-up';
-    doneBtn.addEventListener('click', async () => {
-      doneBtn.disabled = true;
-      try {
-        const { error } = await supabase.from('projects')
-          .update({ last_followup_at: new Date().toISOString() })
-          .eq('id', project.id);
-        if (error) throw error;
-        row.style.opacity = '0';
-        row.style.transition = 'opacity 0.3s';
-        setTimeout(() => {
-          row.remove();
-          if (list.children.length === 0) section.textContent = '';
-        }, 300);
-        haptic(15);
-        toast('Follow-up logged');
-      } catch (err) {
-        if (DEBUG) console.error('followup update failed', err);
-        doneBtn.disabled = false;
-        toast('Could not update', 'error');
-      }
-    });
-    row.appendChild(doneBtn);
-
-    list.appendChild(row);
-  });
-
-  section.appendChild(list);
-}
 
 function _renderFocus() {
   const section = document.getElementById('focus-section');

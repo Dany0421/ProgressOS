@@ -67,13 +67,11 @@ create table if not exists projects (
   title text not null,
   description text,
   category text,
-  status text check (status in ('active', 'completed', 'paused', 'pending_margin')) default 'active',
+  status text check (status in ('active', 'completed', 'paused')) default 'active',
   total_xp_earned integer default 0,
   total_minutes_tracked integer default 0,
   last_session_at timestamptz,
   notes text,
-  pending_margin_since timestamptz,
-  last_followup_at timestamptz,
   created_at timestamptz default now()
 );
 

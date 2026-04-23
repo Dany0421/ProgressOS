@@ -5,7 +5,7 @@ var _milestones = {};
 var _userId = null;
 var _activeProject = null;
 var _timerInterval = null;
-var _projectFilter = 'active_paused'; // 'active_paused' | 'completed'
+var _projectFilter = 'active_paused'; // 'active_paused' | 'pending_margin' | 'completed'
 
 const TIMER_KEY = 'progress_os_timer';
 
@@ -57,8 +57,9 @@ function _renderProjectFilter() {
   bar.textContent = '';
 
   const tabs = [
-    { key: 'active_paused', label: 'Active', count: _projects.filter(p => p.status !== 'completed').length },
-    { key: 'completed',     label: 'Completed', count: _projects.filter(p => p.status === 'completed').length }
+    { key: 'active_paused',  label: 'Active',          count: _projects.filter(p => p.status === 'active' || p.status === 'paused').length },
+    { key: 'pending_margin', label: 'Pending Margin',  count: _projects.filter(p => p.status === 'pending_margin').length },
+    { key: 'completed',      label: 'Completed',       count: _projects.filter(p => p.status === 'completed').length }
   ];
 
   tabs.forEach(tab => {
@@ -80,19 +81,31 @@ function _renderList() {
   list.textContent = '';
 
   const timer = _getRunningTimer();
-  const filtered = _projectFilter === 'completed'
-    ? _projects.filter(p => p.status === 'completed')
-    : _projects.filter(p => p.status !== 'completed');
+  let filtered;
+  if (_projectFilter === 'completed') {
+    filtered = _projects.filter(p => p.status === 'completed');
+  } else if (_projectFilter === 'pending_margin') {
+    filtered = _projects.filter(p => p.status === 'pending_margin');
+  } else {
+    filtered = _projects.filter(p => p.status === 'active' || p.status === 'paused');
+  }
+
+  const emptyLabels = {
+    completed:      ['No completed projects.', 'Complete one to see it here.'],
+    pending_margin: ['Nothing pending margin.', 'Set a project to Pending Margin when waiting on something.'],
+    active_paused:  ['No projects yet.',        'Start building.']
+  };
+  const [emptyTitle, emptySub] = emptyLabels[_projectFilter] || emptyLabels.active_paused;
 
   if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     const title = document.createElement('p');
     title.className = 'empty-state-title';
-    title.textContent = _projectFilter === 'completed' ? 'No completed projects.' : 'No projects yet.';
+    title.textContent = emptyTitle;
     const sub = document.createElement('p');
     sub.className = 'empty-state-sub';
-    sub.textContent = _projectFilter === 'completed' ? 'Complete one to see it here.' : 'Start building.';
+    sub.textContent = emptySub;
     empty.appendChild(title);
     empty.appendChild(sub);
     list.appendChild(empty);
@@ -121,9 +134,10 @@ function _createProjectCard(project, timer) {
   name.textContent = project.title;
   topRow.appendChild(name);
 
+  const statusLabels = { active: 'Active', paused: 'Paused', completed: 'Completed', pending_margin: 'Pending Margin' };
   const statusBadge = document.createElement('span');
   statusBadge.className = 'project-status project-status--' + project.status;
-  statusBadge.textContent = project.status.charAt(0).toUpperCase() + project.status.slice(1);
+  statusBadge.textContent = statusLabels[project.status] || project.status;
   topRow.appendChild(statusBadge);
   card.appendChild(topRow);
 
@@ -243,6 +257,64 @@ function _closeDetail() {
 function _wireBack() {
   const btn = document.getElementById('btn-back');
   if (btn) btn.addEventListener('click', _closeDetail);
+  const optionsBtn = document.getElementById('btn-project-options');
+  if (optionsBtn) optionsBtn.addEventListener('click', _openProjectOptions);
+}
+
+function _openProjectOptions() {
+  const project = _activeProject;
+  if (!project) return;
+
+  const content = document.createElement('div');
+  content.className = 'settings-content';
+
+  const nameLabel = document.createElement('p');
+  nameLabel.className = 'sheet-option-label';
+  nameLabel.textContent = project.title;
+  content.appendChild(nameLabel);
+
+  if (project.status !== 'pending_margin') {
+    const pmBtn = document.createElement('button');
+    pmBtn.className = 'btn-primary';
+    pmBtn.textContent = 'Set Pending Margin';
+    pmBtn.addEventListener('click', async () => {
+      await _setProjectStatus('pending_margin');
+      hideBottomSheet();
+    });
+    content.appendChild(pmBtn);
+  } else {
+    const activeBtn = document.createElement('button');
+    activeBtn.className = 'btn-primary';
+    activeBtn.textContent = 'Back to Active';
+    activeBtn.addEventListener('click', async () => {
+      await _setProjectStatus('active');
+      hideBottomSheet();
+    });
+    content.appendChild(activeBtn);
+  }
+
+  showBottomSheet(content, 'Project options');
+}
+
+async function _setProjectStatus(newStatus) {
+  try {
+    const updates = { status: newStatus };
+    if (newStatus === 'pending_margin') {
+      updates.pending_margin_since = new Date().toISOString();
+      updates.last_followup_at = null;
+    } else if (_activeProject.status === 'pending_margin') {
+      updates.pending_margin_since = null;
+      updates.last_followup_at = null;
+    }
+    const { error } = await supabase.from('projects').update(updates).eq('id', _activeProject.id);
+    if (error) throw error;
+    Object.assign(_activeProject, updates);
+    toast(newStatus === 'pending_margin' ? 'Set to Pending Margin' : 'Back to Active');
+    _loadData().then(() => { _renderProjectFilter(); _renderList(); }).catch(() => {});
+  } catch (err) {
+    if (DEBUG) console.error('setProjectStatus failed', err);
+    toast('Could not update status', 'error');
+  }
 }
 
 // ---- Detail render ----

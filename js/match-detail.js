@@ -77,6 +77,7 @@ function _destroyMatchDetail() {
     _matchViewEl.parentNode.removeChild(_matchViewEl);
   }
   _matchViewEl = null;
+  document.body.style.overflow = '';
 }
 
 // ---- Hero ----

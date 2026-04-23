@@ -56,6 +56,7 @@ function _renderMatchDetail() {
   view.appendChild(_renderFooter(state, event, prediction, result));
 
   document.body.appendChild(view);
+  document.body.style.overflow = 'hidden';
   if (window.lucide) lucide.createIcons();
   requestAnimationFrame(() => view.classList.add('view--visible'));
 }
@@ -66,6 +67,7 @@ function closeMatchDetail() {
   const el = _matchViewEl;
   el.addEventListener('transitionend', () => {
     if (el.parentNode) el.parentNode.removeChild(el);
+    document.body.style.overflow = '';
   }, { once: true });
   _matchViewEl = null;
 }
@@ -136,7 +138,7 @@ function _renderHero(event, result) {
     metaText += tag + ' · ';
   }
   const dateLabel = event.event_date === todayLocal() ? 'TODAY' : event.event_date;
-  metaText += dateLabel + ' · ' + event.kickoff_time.slice(0, 5);
+  metaText += dateLabel + ' · ' + (event.kickoff_time || '').slice(0, 5);
   meta.textContent = metaText;
   hero.appendChild(meta);
 
@@ -243,7 +245,13 @@ function _renderFooter(state, event, prediction, result) {
   } else if (state === 'ready-to-settle') {
     btn.classList.add('match-btn--settle');
     btn.textContent = 'ENTER RESULT →';
-    btn.addEventListener('click', () => openSettleSheet(event, prediction));
+    btn.addEventListener('click', () => {
+      if (typeof openSettleSheet === 'function') {
+        openSettleSheet(event, prediction);
+      } else {
+        toast('Settlement coming soon', 'error');
+      }
+    });
   } else if (state === 'settled') {
     btn.classList.add('match-btn--settled');
     const awarded = result.total_xp_awarded || 0;
@@ -299,12 +307,24 @@ async function _savePredictionsFromDOM(event) {
     };
   }
 
-  const session = await supabase.auth.getSession();
-  const userId = session.data.session.user.id;
-  const ok = await savePrediction(userId, event.id, fields);
-  if (ok) {
-    toast('Predictions saved');
-    openMatchDetail(event.id);
+  const saveBtn = _matchViewEl ? _matchViewEl.querySelector('.match-btn--save') : null;
+  if (saveBtn) saveBtn.disabled = true;
+
+  try {
+    const session = await supabase.auth.getSession();
+    const userId = session.data.session?.user?.id;
+    if (!userId) { toast('Not signed in', 'error'); if (saveBtn) saveBtn.disabled = false; return; }
+    const ok = await savePrediction(userId, event.id, fields);
+    if (ok) {
+      toast('Predictions saved');
+      openMatchDetail(event.id);
+    } else {
+      if (saveBtn) saveBtn.disabled = false;
+    }
+  } catch (err) {
+    if (DEBUG) console.error('_savePredictionsFromDOM failed', err);
+    toast('Could not save predictions', 'error');
+    if (saveBtn) saveBtn.disabled = false;
   }
 }
 

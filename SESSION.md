@@ -5,7 +5,7 @@
 ---
 
 ## Last Updated
-2026-04-22
+2026-04-23
 
 ---
 
@@ -152,17 +152,17 @@
 
 **Committed** — Phase 0 + 1 already on main (commits: `Phase 1 - Events`, `Fix Events page`, `Fix`, `Last fix phase 1`, `Update SESSION.md`).
 
-**Pending — start here next session: Phase 2 — Match detail page (editable state)**
+**Phase 2 — Match detail page ✅ (phone-tested 2026-04-23)**
+- [x] `js/match-detail.js` — `openMatchDetail(eventId)` / `closeMatchDetail()`, 4-state dispatcher (pre-game / live / ready-to-settle / settled)
+- [x] `_renderHero` — competition badge, team crests (Barça gradient + gold / opponent muted), VS/score mid, meta line, chequered separator
+- [x] `_renderFootballSection` — editable (score inputs + winner/first-scorer pills + name input), locked pair rows, settled verdict rows (✓/✗ + XP tags)
+- [x] `_renderF1Section` — P1/P2/P3/fastest-lap text inputs + optional rain%, locked pair rows, settled verdict rows + perfect-podium bonus row
+- [x] `_renderFooter` — SAVE PREDICTIONS / IN PROGRESS (disabled) / ENTER RESULT → (guarded `openSettleSheet`) / +XP EARNED
+- [x] `_savePredictionsFromDOM` — validates, disables save btn during write, null-guards session + kickoff_time
+- [x] Body scroll lock on open (`overflow: hidden`) + restore on close and `_destroyMatchDetail`
+- [x] CSS block in `css/match-day.css` (170 lines), `<script>` added to `index.html`
 
-Steps in plan file (follow exactly):
-- 2.1: Scaffold `js/match-detail.js` with `openMatchDetail(eventId)` / `closeMatchDetail()` + 4-state dispatcher (PRE-GAME / LIVE / SETTLE / SETTLED)
-- 2.2: `_renderHero(event, result)` — competition badge, team crests (Barça gradient + gold border / opponent muted), match meta line (`🏠 HOME · TODAY 21:00`), chequered separator
-- 2.3: `_renderFootballSection(state, event, prediction, result)` — editable/locked/verdict rows (score input pair, winner pills, first scorer team pills, first scorer name text input). Reuses `.priority-btn` pattern with `--active` modifier — don't forget the non-semantic active CSS override (see Known Bugs below)
-- 2.4: `_renderFooter` + `_savePredictionsFromDOM(event)` — SAVE PREDICTIONS button (orange gradient) calls `savePrediction()` → refetch + rerender
-- 2.5: `_renderF1Section` — 4 text inputs (P1/P2/P3/fastest_lap) + optional rain_pct number
-- 2.6: CSS block for match view + predictions + footer + `<script src="js/match-detail.js">` in `index.html`
-
-After Phase 2 → phone-test: open events list → tap row → match detail slide-in with PRE-GAME form → save → persists → reopen after kickoff → LIVE state (red pulsing, locked).
+**Pending — start here next session: Phase 3 — Dashboard widget (single event)**
 
 **Subsequent phases (each = phone-test gate + commit):**
 - Phase 3: dashboard widget (single event, no carousel yet)
@@ -178,7 +178,7 @@ After Phase 2 → phone-test: open events list → tap row → match detail slid
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phase 0 + 1 done + committed. Resume at Phase 2 (match detail page — `js/match-detail.js`, hero + football/F1 sections + footer, plus CSS block in `css/match-day.css`).
+Phase 11 — Match Day Vibe — mid-build. Phases 0, 1, 2 done + committed + pushed. Resume at Phase 3 — dashboard widget (single event, `js/match-widget.js`, slot above heatmap in `index.html`).
 
 ---
 

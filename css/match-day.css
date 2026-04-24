@@ -113,6 +113,8 @@
   transform: translateX(100%);
   transition: transform 260ms ease;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 0 16px calc(var(--nav-height) + env(safe-area-inset-bottom) + 24px);
 }
 .match-view.view--visible { transform: translateX(0); }

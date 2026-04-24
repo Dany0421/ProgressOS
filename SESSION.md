@@ -169,10 +169,19 @@
 - [x] No events today → slot stays empty, no extra space
 - [x] Fix: `padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 24px)` on `.match-view` — nav (z-index 1000) was hiding the Save button (view was z-index 970, only 24px bottom padding)
 
-**Pending — start here next session: Phase 4 — Settlement + XP rewards**
+**Phase 4 — Settlement + XP ✅ (phone-tested 2026-04-25)**
+- [x] `openSettleSheet(event, prediction)` appended to `js/match-detail.js` — opens bottom sheet "Enter result" with sport-specific form
+- [x] Football: score inputs + winner pills + first-scorer team pills + scorer name input; each field shows "You predicted: X" in gold above the input
+- [x] F1: P1/P2/P3/fastest-lap text inputs + optional rain YES/NO pills; same "You predicted" labels
+- [x] `_collectSettleFormResult` — validates all required fields, maps form → result object for RPC
+- [x] `settleEvent` RPC called → toast `+XP · PERFECT` or "Result saved, no XP"; match detail re-opens in settled state
+- [x] `checkAchievements` called if perfect prediction
+- [x] `window._reloadMatchWidget` wired in `match-widget.js` — widget refreshes badge to SETTLED after settlement
+- [x] Fix: `overscroll-behavior: contain` + `-webkit-overflow-scrolling: touch` on `.match-view` — scroll was propagating to background page
+
+**Pending — start here next session: Phase 5 — Theme skin activation**
 
 **Subsequent phases (each = phone-test gate + commit):**
-- Phase 4: settlement + XP (reconciliation sheet with "You predicted: X" inline)
 - Phase 5: theme skin activation (blaugrana body.match-day, F1 palette map)
 - Phase 6: F1 team picker in Profile
 - Phase 7: carousel for multiple same-day events (scroll-snap + dots)
@@ -184,7 +193,7 @@
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phases 0, 1, 2, 3 done + committed + pushed. Resume at Phase 4 — Settlement + XP rewards (`openSettleSheet` in `match-detail.js`).
+Phase 11 — Match Day Vibe — mid-build. Phases 0–4 done + committed + pushed. Resume at Phase 5 — Theme skin activation (`js/match-day.js`, `body.match-day` class + CSS palette vars).
 
 ---
 

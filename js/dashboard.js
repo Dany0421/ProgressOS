@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await _loadAll();
     _renderPlayerCard();
     _renderStats();
+    initMatchWidget(_userId);
     _renderHeatmap();
     _renderFocus();
     _renderFeed();

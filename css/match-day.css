@@ -233,3 +233,109 @@
   background: linear-gradient(90deg, #E8002D, #1a1a1a);
   border-color: #C0C0C0;
 }
+
+/* ---- Match Widget (Phase 3) ---- */
+.match-widget-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.match-widget-card:active {
+  border-color: var(--accent-primary);
+  background: var(--bg-subtle);
+}
+
+.match-widget-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.match-widget-sport-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.match-widget-comp {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  flex: 1;
+}
+.match-widget-time {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.match-widget-teams {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.match-widget-team {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  flex: 1;
+  color: var(--text-secondary);
+}
+.match-widget-team--self {
+  color: var(--text-primary);
+}
+.match-widget-team--opp {
+  text-align: right;
+}
+.match-widget-vs {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.match-widget-gp {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.match-widget-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.match-widget-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.match-widget-badge--upcoming {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+.match-widget-badge--live {
+  background: rgba(163, 255, 18, 0.14);
+  color: var(--accent-primary);
+}
+.match-widget-badge--settle {
+  background: rgba(255, 107, 53, 0.14);
+  color: var(--xp-color);
+}
+.match-widget-badge--settled {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+}
+.match-widget-home-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}

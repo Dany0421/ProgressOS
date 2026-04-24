@@ -162,10 +162,16 @@
 - [x] Body scroll lock on open (`overflow: hidden`) + restore on close and `_destroyMatchDetail`
 - [x] CSS block in `css/match-day.css` (170 lines), `<script>` added to `index.html`
 
-**Pending — start here next session: Phase 3 — Dashboard widget (single event)**
+**Phase 3 — Dashboard widget ✅ (phone-tested 2026-04-25)**
+- [x] `js/match-widget.js` — `initMatchWidget(userId)`, fetches today's events, picks first unsettled (fallback: last settled), renders card above heatmap
+- [x] Card: sport icon (goal/flag) + competition label + kickoff time + teams row (BARÇA VS OPP) or GP name (F1) + status badge (UPCOMING / LIVE X' / ENTER RESULT ▸ / SETTLED)
+- [x] Tappable → `openMatchDetail(event.id)`
+- [x] No events today → slot stays empty, no extra space
+- [x] Fix: `padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 24px)` on `.match-view` — nav (z-index 1000) was hiding the Save button (view was z-index 970, only 24px bottom padding)
+
+**Pending — start here next session: Phase 4 — Settlement + XP rewards**
 
 **Subsequent phases (each = phone-test gate + commit):**
-- Phase 3: dashboard widget (single event, no carousel yet)
 - Phase 4: settlement + XP (reconciliation sheet with "You predicted: X" inline)
 - Phase 5: theme skin activation (blaugrana body.match-day, F1 palette map)
 - Phase 6: F1 team picker in Profile
@@ -178,7 +184,7 @@
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phases 0, 1, 2 done + committed + pushed. Resume at Phase 3 — dashboard widget (single event, `js/match-widget.js`, slot above heatmap in `index.html`).
+Phase 11 — Match Day Vibe — mid-build. Phases 0, 1, 2, 3 done + committed + pushed. Resume at Phase 4 — Settlement + XP rewards (`openSettleSheet` in `match-detail.js`).
 
 ---
 

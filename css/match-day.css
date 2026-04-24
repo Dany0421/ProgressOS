@@ -339,3 +339,10 @@
   color: var(--text-muted);
   letter-spacing: 0.08em;
 }
+
+/* ---- Settle sheet (Phase 4) ---- */
+.settle-sheet { gap: 14px; }
+.settle-intro { color: var(--text-muted); font-size: 12px; margin-bottom: 4px; }
+.settle-field { margin-top: 6px; }
+.settle-field-title { color: var(--text-muted); font-size: 10px; letter-spacing: 0.18em; margin: 0; }
+.settle-field-pred { color: #FFD166; font-size: 11px; margin: 2px 0 0; letter-spacing: 0.1em; }

@@ -479,3 +479,187 @@ function _verdictRow(label, value, correct, xp) {
   row.appendChild(v);
   return row;
 }
+
+// ---- Settlement ----
+
+function openSettleSheet(event, prediction) {
+  const p = prediction || {};
+  const form = document.createElement('div');
+  form.className = 'sheet-form settle-sheet';
+
+  const intro = document.createElement('p');
+  intro.className = 'settle-intro';
+  intro.textContent = 'Enter what actually happened — XP per field you nailed.';
+  form.appendChild(intro);
+
+  if (event.sport === 'football') {
+    _appendSettleFootball(form, event, p);
+  } else {
+    _appendSettleF1(form, event, p);
+  }
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn-primary';
+  btn.textContent = 'Confirm result';
+  btn.addEventListener('click', async () => {
+    const result = _collectSettleFormResult(event, p);
+    if (!result) return;
+    btn.disabled = true;
+    const data = await settleEvent(event.id, result);
+    if (!data) { btn.disabled = false; return; }
+
+    hideBottomSheet();
+
+    if (data.awarded_xp > 0) {
+      toast('+' + data.awarded_xp + ' XP' + (data.perfect ? ' · PERFECT' : ''));
+    } else {
+      toast('Result saved, no XP this time');
+    }
+
+    if (typeof checkAchievements === 'function' && data.perfect) {
+      const session = await supabase.auth.getSession();
+      const uid = session.data.session && session.data.session.user.id;
+      if (uid) {
+        checkAchievements(uid, { type: 'prediction_perfect', meta: { event_id: event.id } })
+          .then(function(unlocks) { if (unlocks && unlocks.length) processUnlocks(uid, unlocks); });
+      }
+    }
+
+    openMatchDetail(event.id);
+    if (typeof window._reloadMatchWidget === 'function') window._reloadMatchWidget();
+  });
+  form.appendChild(btn);
+
+  showBottomSheet(form, 'Enter result');
+}
+
+function _appendSettleFootball(form, event, p) {
+  _appendWithYouPredictedLabel(form, 'SCORE',
+    (p.pred_self_score != null ? p.pred_self_score : '—') + ' – ' + (p.pred_opponent_score != null ? p.pred_opponent_score : '—'));
+  const row = document.createElement('div');
+  row.className = 'score-input-wrap';
+  const h = document.createElement('input');
+  h.type = 'number'; h.min = 0; h.max = 20; h.className = 'score-input';
+  h.dataset.resKey = 'self_score';
+  const dash = document.createElement('span');
+  dash.className = 'score-dash'; dash.textContent = '–';
+  const a = document.createElement('input');
+  a.type = 'number'; a.min = 0; a.max = 20; a.className = 'score-input';
+  a.dataset.resKey = 'opponent_score';
+  row.appendChild(h); row.appendChild(dash); row.appendChild(a);
+  form.appendChild(row);
+
+  _appendWithYouPredictedLabel(form, 'WINNER', _labelFor(p.pred_winner, event));
+  form.appendChild(_settlePills('winner', [
+    ['self', 'BARÇA'], ['draw', 'DRAW'],
+    ['opponent', (event.opponent || 'OPPONENT').toUpperCase()]
+  ]));
+
+  _appendWithYouPredictedLabel(form, '1ST SCORER · TEAM',
+    p.pred_first_scorer_team === 'self' ? 'BARÇA'
+      : p.pred_first_scorer_team === 'opponent' ? (event.opponent || '').toUpperCase()
+      : p.pred_first_scorer_team === 'none' ? 'NONE' : '—');
+  form.appendChild(_settlePills('first_scorer_team', [
+    ['self', 'BARÇA'],
+    ['opponent', (event.opponent || 'OPPONENT').toUpperCase()],
+    ['none', 'NONE']
+  ]));
+
+  _appendWithYouPredictedLabel(form, '1ST SCORER · NAME', p.pred_first_scorer_name || '—');
+  const name = document.createElement('input');
+  name.type = 'text'; name.className = 'form-input';
+  name.dataset.resKey = 'first_scorer_name';
+  name.maxLength = 60; name.placeholder = 'Lewandowski';
+  form.appendChild(name);
+}
+
+function _appendSettleF1(form, event, p) {
+  ['p1', 'p2', 'p3', 'fastest_lap'].forEach(function(k) {
+    var upper = k === 'fastest_lap' ? 'FASTEST LAP' : k.toUpperCase();
+    _appendWithYouPredictedLabel(form, upper, p['pred_' + k] || '—');
+    var inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'form-input';
+    inp.dataset.resKey = k; inp.maxLength = 60;
+    form.appendChild(inp);
+  });
+  if (p.pred_rain_pct != null) {
+    _appendWithYouPredictedLabel(form, 'RAIN', p.pred_rain_pct + '%');
+    form.appendChild(_settlePills('rain_happened', [['true', 'YES'], ['false', 'NO']]));
+  }
+}
+
+function _appendWithYouPredictedLabel(form, title, prediction) {
+  const wrap = document.createElement('div');
+  wrap.className = 'settle-field';
+  const t = document.createElement('p');
+  t.className = 'settle-field-title mono';
+  t.textContent = title;
+  wrap.appendChild(t);
+  const p = document.createElement('p');
+  p.className = 'settle-field-pred mono';
+  p.textContent = 'You predicted: ' + prediction;
+  wrap.appendChild(p);
+  form.appendChild(wrap);
+}
+
+function _settlePills(resKey, options) {
+  const row = document.createElement('div');
+  row.className = 'pred-pill-row';
+  row.dataset.resKey = resKey;
+  options.forEach(function(opt) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pred-pill';
+    b.textContent = opt[1];
+    b.dataset.value = opt[0];
+    b.addEventListener('click', function() {
+      row.querySelectorAll('.pred-pill').forEach(function(x) { x.classList.remove('pred-pill--active'); });
+      b.classList.add('pred-pill--active');
+    });
+    row.appendChild(b);
+  });
+  return row;
+}
+
+function _collectSettleFormResult(event, p) {
+  const sheet = document.querySelector('.bottom-sheet');
+  if (!sheet) return null;
+
+  if (event.sport === 'football') {
+    const self = sheet.querySelector('input[data-res-key="self_score"]');
+    const opp = sheet.querySelector('input[data-res-key="opponent_score"]');
+    const winner = sheet.querySelector('[data-res-key="winner"] .pred-pill--active');
+    const team = sheet.querySelector('[data-res-key="first_scorer_team"] .pred-pill--active');
+    const name = sheet.querySelector('input[data-res-key="first_scorer_name"]');
+
+    if (!self || self.value === '' || !opp || opp.value === '') { toast('Enter final score', 'error'); return null; }
+    if (!winner) { toast('Pick winner', 'error'); return null; }
+    if (!team) { toast('Pick first-scorer team', 'error'); return null; }
+    if (team.dataset.value !== 'none' && (!name || !name.value.trim())) {
+      toast('Enter scorer name', 'error'); return null;
+    }
+    return {
+      self_score: parseInt(self.value, 10),
+      opponent_score: parseInt(opp.value, 10),
+      winner: winner.dataset.value,
+      first_scorer_team: team.dataset.value,
+      first_scorer_name: team.dataset.value === 'none' ? null : name.value.trim()
+    };
+  } else {
+    var r = {};
+    var missing = null;
+    ['p1', 'p2', 'p3', 'fastest_lap'].forEach(function(k) {
+      const inp = sheet.querySelector('input[data-res-key="' + k + '"]');
+      if (!inp || !inp.value.trim()) missing = k;
+      else r[k] = inp.value.trim();
+    });
+    if (missing) { toast('Enter all 4 F1 fields', 'error'); return null; }
+
+    if (p.pred_rain_pct != null) {
+      const rain = sheet.querySelector('[data-res-key="rain_happened"] .pred-pill--active');
+      if (rain) r.rain_happened = rain.dataset.value === 'true';
+    }
+    return r;
+  }
+}

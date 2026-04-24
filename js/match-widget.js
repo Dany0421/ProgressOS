@@ -1,11 +1,21 @@
 var DEBUG = false;
 
+var _widgetUserId = null;
+
+window._reloadMatchWidget = function() {
+  if (!_widgetUserId) return;
+  const section = document.getElementById('match-widget-section');
+  if (section) section.textContent = '';
+  initMatchWidget(_widgetUserId);
+};
+
 async function initMatchWidget(userId) {
+  _widgetUserId = userId;
   const section = document.getElementById('match-widget-section');
   if (!section) return;
 
   try {
-    const events = await fetchTodayEvents(userId);
+    const events = await fetchTodayEvents(_widgetUserId);
     if (!events || events.length === 0) return;
 
     // Prefer the first unsettled event; fall back to last (most recent) settled one

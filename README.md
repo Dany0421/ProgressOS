@@ -149,15 +149,11 @@ Supabase dashboard → SQL Editor, run each file in order:
 3. [`sql/achievements.sql`](./sql/achievements.sql) — achievements schema, 40 seed rows, `check_achievements` / `backfill_achievements` / `set_active_title` / `mark_achievements_seen` RPCs
 4. [`sql/match-day.sql`](./sql/match-day.sql) — events / predictions / results tables, `settle_event` RPC, `_maputo_today()` utility
 
-### 3. Create your account
-
-Open the app (step 6 below), click **Create account** on the login screen, enter your email and a password. That's it — the app handles sign-up and creates your profile row automatically.
-
-### 4. Configure auth URLs
+### 3. Configure auth URLs
 
 Authentication → URL Configuration. Add your local dev URL (e.g. `http://127.0.0.1:5500/**`) and your GitHub Pages URL (e.g. `https://yourname.github.io/ProgressOS/**`) to Redirect URLs. The `**` matters.
 
-### 5. Clone + configure
+### 4. Clone + configure
 
 ```bash
 git clone https://github.com/Dany0421/ProgressOS.git
@@ -170,13 +166,13 @@ const SUPABASE_URL = 'https://xxx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJ...';
 ```
 
-### 6. Run it
+### 5. Run it
 
 Any static server works. Easiest:
 - **VS Code Live Server** — right-click `login.html` → Open with Live Server
 - **Python** — `python3 -m http.server 5500` and open `http://127.0.0.1:5500/login.html`
 
-Log in with the credentials you set in step 3. Done.
+Log in or create your account on the login screen. Done.
 
 ---
 

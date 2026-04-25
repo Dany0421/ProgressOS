@@ -512,7 +512,10 @@ function openSettleSheet(event, prediction) {
     hideBottomSheet();
 
     if (data.awarded_xp > 0) {
-      toast('+' + data.awarded_xp + ' XP' + (data.perfect ? ' · PERFECT' : ''));
+      var msg = '+' + data.awarded_xp + ' XP';
+      if (data.perfect) msg += ' · PERFECT';
+      if (data.win_bonus) msg += ' · WIN BONUS';
+      toast(msg);
     } else {
       toast('Result saved, no XP this time');
     }

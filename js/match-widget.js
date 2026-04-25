@@ -175,3 +175,64 @@ function _buildWidgetBadge(event) {
 
   return badge;
 }
+
+// ---- Phase 8: Past unsettled nudges ----
+
+async function renderPastUnsettledNudges(userId) {
+  const container = document.getElementById('match-nudge-slot');
+  if (!container) return;
+  container.textContent = '';
+
+  const today = todayLocal();
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, sport, event_date, kickoff_time, opponent, gp_name, competition, custom_label')
+      .eq('user_id', userId)
+      .eq('settled', false)
+      .lt('event_date', today)
+      .gte('event_date', _daysAgo(7))
+      .order('event_date', { ascending: false })
+      .limit(3);
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+    data.forEach(ev => container.appendChild(_renderNudgeCard(ev)));
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    if (DEBUG) console.error('renderPastUnsettledNudges failed', err);
+  }
+}
+
+function _daysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
+
+function _renderNudgeCard(ev) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'match-nudge';
+
+  const icon = document.createElement('i');
+  icon.setAttribute('data-lucide', ev.sport === 'football' ? 'goal' : 'flag');
+  card.appendChild(icon);
+
+  const msg = document.createElement('span');
+  msg.className = 'match-nudge-msg';
+  const yesterday = _daysAgo(1);
+  const when = ev.event_date === yesterday ? 'yesterday' : ev.event_date;
+  msg.textContent = ev.sport === 'football'
+    ? 'Barça vs ' + (ev.opponent || '?') + ' ' + when + ' — enter result'
+    : (ev.gp_name || 'F1') + ' ' + when + ' — enter result';
+  card.appendChild(msg);
+
+  const chev = document.createElement('i');
+  chev.setAttribute('data-lucide', 'chevron-right');
+  card.appendChild(chev);
+
+  card.addEventListener('click', () => {
+    if (typeof openMatchDetail === 'function') openMatchDetail(ev.id);
+  });
+  return card;
+}

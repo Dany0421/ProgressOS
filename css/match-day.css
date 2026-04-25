@@ -437,3 +437,20 @@ body.match-day .player-avatar {
   transition: background 160ms ease;
 }
 .match-widget-dot--active { background: #FFD166; }
+
+/* ---- Phase 8: Nudges ---- */
+.match-nudge-slot { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.match-nudge {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid #FF6B35;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: inherit; font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.match-nudge-msg { flex: 1; }
+.match-nudge i { color: #FF6B35; }

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     _renderPlayerCard();
     _renderStats();
     initMatchWidget(_userId);
+    if (typeof renderPastUnsettledNudges === 'function') renderPastUnsettledNudges(_userId);
     if (typeof applyMatchDayTheme === 'function') applyMatchDayTheme(_userId);
     _renderHeatmap();
     _renderFocus();

@@ -5,15 +5,15 @@
 ---
 
 ## Last Updated
-2026-04-25
+2026-04-25 (Phase 11 multi-team)
 
 ---
 
 ## Project Status
 
-**Phase**: Phase 11 — Match Day Vibe (mid-build — backend + Events list shipped, UI layers pending)
+**Phase**: Phase 11 — Multi-Team Football Support **COMPLETO**
 
-**Current focus**: Match Day Vibe V1 — **COMPLETO**. Todas as fases 0–10 implementadas. Próxima feature a definir com Dany.
+**Current focus**: Multi-team done. Próxima feature a definir com Dany.
 
 **This session also shipped**: Change Username feature (Profile name tappable + pencil icon → bottom sheet → update + case-insensitive unique index on DB). Fully phone-tested and working.
 
@@ -222,9 +222,26 @@
 
 ---
 
+### Phase 11 — Multi-Team Football Support ✅ (2026-04-25)
+
+**Spec**: `docs/specs/2026-04-25-multi-team-design.md` (gitignored)
+
+- [x] **DB**: `ALTER events ADD COLUMN self_team text` (nullable, fallback to BARÇA display)
+- [x] **settle_event RPC**: +15 XP win bonus when `self_team IS NOT NULL AND winner = 'self'`; `win_bonus` flag in return value
+- [x] **events-view.js**: Football form — Team input + Venue label (was "Barça plays") + self_team pill picker (conditional, appears when both team + opponent filled, updates live as user types, optional)
+- [x] **selfTeamLabel(event)**: `(event.self_team || 'BARÇA').toUpperCase()` helper added to match-detail, match-widget, events-view
+- [x] **match-detail.js**: 9 BARÇA hardcodes replaced (hero chip, prediction pills, settle sheet, _labelFor, toast shows "· WIN BONUS")
+- [x] **match-widget.js**: 3 refs replaced (widget card, next-up title, nudge message); nudge select now includes self_team
+- [x] **match-day.js**: `_footballPalette(selfTeam)` — null → no theme, barça/barca/fc barcelona → blaugrana, anything else → green/gold international (#00A651/#1A1A2E/#FFD700)
+- [x] **Code review fixes**: `_updateSelfPicker` now re-syncs `selectedSelfTeam` when pill active + user edits; `_daysAgo` now uses Maputo local time
+
+**Pending**: phone test — create Spain vs France, pick Spain, check widget/detail/theme; settle Spain wins, check +15 XP toast
+
+---
+
 ## In Progress 🛠
 
-**Phase 11 — Match Day Vibe ✅ COMPLETO.** Todas as 11 fases (0–10) implementadas, phone-testadas e committed. Próxima feature a definir.
+Nada. Próxima feature a definir com Dany.
 
 ---
 

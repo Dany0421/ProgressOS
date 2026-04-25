@@ -149,9 +149,9 @@ Supabase dashboard → SQL Editor, run each file in order:
 3. [`sql/achievements.sql`](./sql/achievements.sql) — achievements schema, 40 seed rows, `check_achievements` / `backfill_achievements` / `set_active_title` / `mark_achievements_seen` RPCs
 4. [`sql/match-day.sql`](./sql/match-day.sql) — events / predictions / results tables, `settle_event` RPC, `_maputo_today()` utility
 
-### 3. Create your user
+### 3. Create your account
 
-Authentication → Users → Add user (enable "Auto Confirm"). Then Table Editor → `profiles` → Insert row with `id` = your auth user UUID, `username` = whatever you want.
+Open the app (step 6 below), click **Create account** on the login screen, enter your email and a password. That's it — the app handles sign-up and creates your profile row automatically.
 
 ### 4. Configure auth URLs
 

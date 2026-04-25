@@ -439,6 +439,29 @@ body.match-day .player-avatar {
 .match-widget-dot--active { background: #FFD166; }
 
 /* ---- Phase 8: Nudges ---- */
+/* ---- Phase 10: Next-up + empty-add ---- */
+.match-nextup {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-primary);
+  text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 2px;
+  font-family: inherit;
+}
+.match-nextup-label { font-size: 9px; letter-spacing: 0.2em; color: var(--text-muted); }
+.match-nextup-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+.widget-empty-add {
+  width: 100%; padding: 10px 14px;
+  background: transparent;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 11px; letter-spacing: 0.14em;
+  cursor: pointer;
+}
+
 .match-nudge-slot { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
 .match-nudge {
   display: flex; align-items: center; gap: 10px;

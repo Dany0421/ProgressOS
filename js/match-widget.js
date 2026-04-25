@@ -16,7 +16,28 @@ async function initMatchWidget(userId) {
 
   try {
     const events = await fetchTodayEvents(_widgetUserId);
-    if (!events || events.length === 0) return;
+    if (!events || events.length === 0) {
+      const upcoming = await fetchUpcomingEvents(_widgetUserId);
+      const next7 = upcoming.filter(e => {
+        const d = new Date(e.event_date + 'T00:00:00+02:00');
+        const diff = (d - new Date()) / (1000 * 60 * 60 * 24);
+        return diff > 0 && diff < 7;
+      });
+      if (next7.length > 0) {
+        section.appendChild(_renderNextUpCard(next7[0]));
+      } else {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'widget-empty-add mono';
+        btn.textContent = '+ ADD EVENT';
+        btn.addEventListener('click', () => {
+          if (typeof openEventsView === 'function') openEventsView();
+        });
+        section.appendChild(btn);
+      }
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
 
     if (events.length === 1) {
       section.appendChild(_buildWidgetCard(events[0]));
@@ -174,6 +195,35 @@ function _buildWidgetBadge(event) {
   }
 
   return badge;
+}
+
+// ---- Phase 10: Next-up card ----
+
+function _renderNextUpCard(event) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'match-nextup';
+
+  const today = new Date(todayLocal() + 'T00:00:00+02:00');
+  const evDate = new Date(event.event_date + 'T00:00:00+02:00');
+  const days = Math.round((evDate - today) / (1000 * 60 * 60 * 24));
+
+  const label = document.createElement('div');
+  label.className = 'match-nextup-label mono';
+  label.textContent = days === 1 ? 'TOMORROW' : 'IN ' + days + ' DAYS';
+  card.appendChild(label);
+
+  const title = document.createElement('div');
+  title.className = 'match-nextup-title';
+  title.textContent = event.sport === 'football'
+    ? 'Barça vs ' + (event.opponent || '—')
+    : (event.gp_name || '—');
+  card.appendChild(title);
+
+  card.addEventListener('click', () => {
+    if (typeof openMatchDetail === 'function') openMatchDetail(event.id);
+  });
+  return card;
 }
 
 // ---- Phase 8: Past unsettled nudges ----

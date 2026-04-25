@@ -463,6 +463,8 @@ declare
   v_habit_id uuid;
   v_phoenix_len int;
   v_phoenix_prev_max int;
+  v_pred_event events%rowtype;
+  v_perfect_count int;
 begin
   v_type := coalesce(p_trigger->>'type', 'all');
   v_meta := coalesce(p_trigger->'meta', '{}'::jsonb);
@@ -633,6 +635,30 @@ begin
     if v_phoenix_len is not null and v_phoenix_prev_max is not null
        and v_phoenix_len > v_phoenix_prev_max then
       v_candidates := array_append(v_candidates, 'arch-phoenix');
+    end if;
+  end if;
+
+  -- Predictions: event_created → pred-first
+  if v_type = 'event_created' then
+    v_candidates := array_append(v_candidates, 'pred-first');
+  end if;
+
+  -- Predictions: prediction_perfect
+  if v_type = 'prediction_perfect' and (v_meta->>'event_id') is not null then
+    select * into v_pred_event from events where id = (v_meta->>'event_id')::uuid;
+    if found then
+      if v_pred_event.sport = 'football'
+         and lower(coalesce(v_pred_event.custom_label,'')) ilike '%cl%sico%' then
+        v_candidates := array_append(v_candidates, 'pred-clasico');
+      end if;
+      if v_pred_event.sport = 'f1' then
+        v_candidates := array_append(v_candidates, 'pred-perfect-podium');
+      end if;
+    end if;
+    select count(*) into v_perfect_count
+      from event_results where user_id = p_user_id and perfect = true;
+    if v_perfect_count >= 10 then
+      v_candidates := array_append(v_candidates, 'pred-oracle');
     end if;
   end if;
 

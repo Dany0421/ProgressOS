@@ -126,7 +126,7 @@ begin
   v_user_id := v_event.user_id;
 
   select * into v_pred from event_predictions where event_id = p_event_id;
-  if not found then raise exception 'no predictions found — cannot settle'; end if;
+  v_has_pred := found;
 
   if v_event.sport = 'football' then
     -- Score exact: +50

@@ -341,6 +341,18 @@
   color: var(--text-muted);
   letter-spacing: 0.08em;
 }
+.match-widget-score {
+  font-size: 18px;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+.match-widget-podium {
+  font-size: 11px;
+  color: var(--accent-primary);
+  letter-spacing: 0.12em;
+  margin: 2px 0 0;
+  text-align: center;
+}
 
 /* ---- Settle sheet (Phase 4) ---- */
 .settle-sheet { gap: 14px; }

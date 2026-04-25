@@ -64,6 +64,8 @@ function _buildWidgetCard(event) {
   card.appendChild(topRow);
 
   // Content
+  const result = event.event_results && event.event_results[0] ? event.event_results[0] : null;
+
   if (event.sport === 'football') {
     const teamsRow = document.createElement('div');
     teamsRow.className = 'match-widget-teams';
@@ -73,10 +75,15 @@ function _buildWidgetCard(event) {
     self.textContent = 'BARÇA';
     teamsRow.appendChild(self);
 
-    const vs = document.createElement('span');
-    vs.className = 'match-widget-vs mono';
-    vs.textContent = 'VS';
-    teamsRow.appendChild(vs);
+    const mid = document.createElement('span');
+    mid.className = 'match-widget-vs mono';
+    if (result && result.self_score != null && result.opponent_score != null) {
+      mid.textContent = result.self_score + ' - ' + result.opponent_score;
+      mid.classList.add('match-widget-score');
+    } else {
+      mid.textContent = 'VS';
+    }
+    teamsRow.appendChild(mid);
 
     const opp = document.createElement('span');
     opp.className = 'match-widget-team match-widget-team--opp';
@@ -89,6 +96,13 @@ function _buildWidgetCard(event) {
     gp.className = 'match-widget-gp';
     gp.textContent = event.gp_name || 'Race';
     card.appendChild(gp);
+
+    if (result && result.p1) {
+      const podium = document.createElement('p');
+      podium.className = 'match-widget-podium mono';
+      podium.textContent = 'P1 ' + result.p1.toUpperCase();
+      card.appendChild(podium);
+    }
   }
 
   // Status row

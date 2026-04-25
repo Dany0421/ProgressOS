@@ -40,7 +40,7 @@ async function fetchTodayEvents(userId) {
   const today = todayLocal();
   try {
     const { data, error } = await supabase
-      .from('events').select('*').eq('user_id', userId)
+      .from('events').select('*, event_results(self_score, opponent_score, winner, p1, p2, p3, total_xp_awarded, perfect)').eq('user_id', userId)
       .eq('event_date', today)
       .order('kickoff_time', { ascending: true });
     if (error) throw error;

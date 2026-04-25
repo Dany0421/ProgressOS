@@ -348,3 +348,28 @@
 .settle-field { margin-top: 6px; }
 .settle-field-title { color: var(--text-muted); font-size: 10px; letter-spacing: 0.18em; margin: 0; }
 .settle-field-pred { color: #FFD166; font-size: 11px; margin: 2px 0 0; letter-spacing: 0.1em; }
+
+/* ---- Phase 5: Theme skin (body.match-day) ---- */
+body.match-day {
+  background:
+    radial-gradient(ellipse at top right, color-mix(in srgb, var(--match-primary) 22%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, color-mix(in srgb, var(--match-secondary) 22%, transparent) 0%, transparent 55%),
+    var(--bg-base);
+}
+body.match-day .player-card {
+  border-color: var(--match-primary) !important;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--match-primary) 40%, transparent);
+}
+body.match-day .xp-bar-fill {
+  background: linear-gradient(90deg, var(--match-primary), var(--match-secondary), var(--match-accent)) !important;
+}
+body.match-day .heatmap-cell.has-xp {
+  background: var(--match-primary) !important;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--match-primary) 50%, transparent);
+}
+body.match-day .avatar,
+body.match-day .player-avatar {
+  background: linear-gradient(135deg, var(--match-primary), var(--match-secondary)) !important;
+  border: 1px solid var(--match-accent) !important;
+  color: #fff !important;
+}

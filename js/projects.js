@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const session = await checkSession();
   if (!session) return;
   _userId = session.user.id;
+  if (typeof applyMatchDayTheme === 'function') applyMatchDayTheme(_userId);
 
   try {
     await _loadData();

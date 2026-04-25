@@ -14,11 +14,20 @@ const F1_PALETTES = {
 };
 const FOOTBALL_PALETTE = { primary: '#A50044', secondary: '#004D98', accent: '#FFD166' };
 
+function _footballPalette(selfTeam) {
+  if (!selfTeam) return null;
+  const name = selfTeam.toLowerCase().trim();
+  if (name === 'barça' || name === 'barca' || name === 'fc barcelona') {
+    return { primary: '#A50044', secondary: '#004D98', accent: '#FFD166' };
+  }
+  return { primary: '#00A651', secondary: '#1A1A2E', accent: '#FFD700' };
+}
+
 async function getActiveMatchDayEvent(userId) {
   const today = todayLocal();
   try {
     const { data, error } = await supabase.from('events')
-      .select('id, sport, event_date, kickoff_time, settled')
+      .select('id, sport, event_date, kickoff_time, settled, self_team')
       .eq('user_id', userId).eq('event_date', today)
       .order('kickoff_time', { ascending: true });
     if (error) throw error;
@@ -35,7 +44,7 @@ async function applyMatchDayTheme(userId) {
   const event = await getActiveMatchDayEvent(userId);
   if (!event) { removeMatchDayTheme(); return; }
 
-  let palette = FOOTBALL_PALETTE;
+  let palette;
   if (event.sport === 'f1') {
     try {
       const { data: prof } = await supabase.from('profiles').select('f1_team').eq('id', userId).single();
@@ -44,7 +53,11 @@ async function applyMatchDayTheme(userId) {
                                           : { primary: '#CC0000', secondary: '#111', accent: '#FFF' };
     } catch (err) {
       if (DEBUG) console.error('f1_team fetch failed', err);
+      palette = { primary: '#CC0000', secondary: '#111', accent: '#FFF' };
     }
+  } else {
+    palette = _footballPalette(event.self_team);
+    if (!palette) { removeMatchDayTheme(); return; }
   }
 
   document.body.classList.add('match-day', 'match-day--' + event.sport);

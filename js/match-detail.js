@@ -3,6 +3,10 @@ var DEBUG = false;
 var _matchState = null;
 var _matchViewEl = null;
 
+function selfTeamLabel(event) {
+  return (event.self_team || 'BARÇA').toUpperCase();
+}
+
 async function openMatchDetail(eventId) {
   try {
     const state = await fetchEventWithPrediction(eventId);
@@ -102,7 +106,8 @@ function _renderMatchHero(event, result) {
   row.className = 'match-teams-row';
 
   if (event.sport === 'football') {
-    row.appendChild(_makeTeamChip('B', 'BARÇA', 'self'));
+    const _selfLabel = selfTeamLabel(event);
+    row.appendChild(_makeTeamChip(_selfLabel.charAt(0), _selfLabel, 'self'));
     const mid = document.createElement('div');
     mid.className = 'match-mid';
     if (result) {
@@ -186,10 +191,10 @@ function _renderFootballSection(state, event, prediction, result) {
   if (state === 'pre-game') {
     section.appendChild(_scoreRowEditable(p));
     section.appendChild(_pillRowEditable('WINNER', 'winner',
-      [['self', 'BARÇA'], ['draw', 'DRAW'], ['opponent', (event.opponent || 'OPPONENT').toUpperCase()]],
+      [['self', selfTeamLabel(event)], ['draw', 'DRAW'], ['opponent', (event.opponent || 'OPPONENT').toUpperCase()]],
       p.pred_winner || null));
     section.appendChild(_pillRowEditable('1ST SCORER · TEAM', 'first_scorer_team',
-      [['self', 'BARÇA'], ['opponent', (event.opponent || 'OPPONENT').toUpperCase()], ['none', 'NONE']],
+      [['self', selfTeamLabel(event)], ['opponent', (event.opponent || 'OPPONENT').toUpperCase()], ['none', 'NONE']],
       p.pred_first_scorer_team || null));
     section.appendChild(_textRowEditable('1ST SCORER · NAME', 'first_scorer_name',
       p.pred_first_scorer_name || '', 'Lewandowski'));
@@ -197,7 +202,7 @@ function _renderFootballSection(state, event, prediction, result) {
     section.appendChild(_pairRow('SCORE', (p.pred_self_score != null ? p.pred_self_score : '—') + ' – ' + (p.pred_opponent_score != null ? p.pred_opponent_score : '—')));
     section.appendChild(_pairRow('WINNER', _labelFor(p.pred_winner, event)));
     section.appendChild(_pairRow('1ST SCORER TEAM',
-      p.pred_first_scorer_team === 'self' ? 'BARÇA'
+      p.pred_first_scorer_team === 'self' ? selfTeamLabel(event)
       : p.pred_first_scorer_team === 'opponent' ? (event.opponent || '').toUpperCase()
       : p.pred_first_scorer_team === 'none' ? 'NONE' : '—'));
     section.appendChild(_pairRow('1ST SCORER NAME', p.pred_first_scorer_name || '—'));
@@ -207,7 +212,7 @@ function _renderFootballSection(state, event, prediction, result) {
       result.self_score === p.pred_self_score && result.opponent_score === p.pred_opponent_score, 50));
     section.appendChild(_verdictRow('WINNER', _labelFor(result.winner, event), result.winner === p.pred_winner, 20));
     section.appendChild(_verdictRow('1ST SCORER TEAM',
-      result.first_scorer_team === 'self' ? 'BARÇA'
+      result.first_scorer_team === 'self' ? selfTeamLabel(event)
        : result.first_scorer_team === 'opponent' ? (event.opponent || '').toUpperCase() : 'NONE',
       result.first_scorer_team === p.pred_first_scorer_team, 15));
     const nameCorrect = result.first_scorer_team === p.pred_first_scorer_team &&
@@ -219,7 +224,7 @@ function _renderFootballSection(state, event, prediction, result) {
 }
 
 function _labelFor(winner, event) {
-  if (winner === 'self') return 'BARÇA';
+  if (winner === 'self') return selfTeamLabel(event);
   if (winner === 'draw') return 'DRAW';
   if (winner === 'opponent') return (event.opponent || 'OPPONENT').toUpperCase();
   return '—';
@@ -561,16 +566,16 @@ function _appendSettleFootball(form, event, p) {
 
   _appendWithYouPredictedLabel(form, 'WINNER', _labelFor(p.pred_winner, event));
   form.appendChild(_settlePills('winner', [
-    ['self', 'BARÇA'], ['draw', 'DRAW'],
+    ['self', selfTeamLabel(event)], ['draw', 'DRAW'],
     ['opponent', (event.opponent || 'OPPONENT').toUpperCase()]
   ]));
 
   _appendWithYouPredictedLabel(form, '1ST SCORER · TEAM',
-    p.pred_first_scorer_team === 'self' ? 'BARÇA'
+    p.pred_first_scorer_team === 'self' ? selfTeamLabel(event)
       : p.pred_first_scorer_team === 'opponent' ? (event.opponent || '').toUpperCase()
       : p.pred_first_scorer_team === 'none' ? 'NONE' : '—');
   form.appendChild(_settlePills('first_scorer_team', [
-    ['self', 'BARÇA'],
+    ['self', selfTeamLabel(event)],
     ['opponent', (event.opponent || 'OPPONENT').toUpperCase()],
     ['none', 'NONE']
   ]));

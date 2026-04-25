@@ -2,6 +2,10 @@ var DEBUG = false;
 
 var _widgetUserId = null;
 
+function selfTeamLabel(event) {
+  return (event.self_team || 'BARÇA').toUpperCase();
+}
+
 window._reloadMatchWidget = function() {
   if (!_widgetUserId) return;
   const section = document.getElementById('match-widget-section');
@@ -123,7 +127,7 @@ function _buildWidgetCard(event) {
 
     const self = document.createElement('span');
     self.className = 'match-widget-team match-widget-team--self';
-    self.textContent = 'BARÇA';
+    self.textContent = selfTeamLabel(event);
     teamsRow.appendChild(self);
 
     const mid = document.createElement('span');
@@ -216,7 +220,7 @@ function _renderNextUpCard(event) {
   const title = document.createElement('div');
   title.className = 'match-nextup-title';
   title.textContent = event.sport === 'football'
-    ? 'Barça vs ' + (event.opponent || '—')
+    ? selfTeamLabel(event) + ' vs ' + (event.opponent || '—').toUpperCase()
     : (event.gp_name || '—');
   card.appendChild(title);
 
@@ -237,7 +241,7 @@ async function renderPastUnsettledNudges(userId) {
   try {
     const { data, error } = await supabase
       .from('events')
-      .select('id, sport, event_date, kickoff_time, opponent, gp_name, competition, custom_label')
+      .select('id, sport, event_date, kickoff_time, opponent, gp_name, competition, custom_label, self_team')
       .eq('user_id', userId)
       .eq('settled', false)
       .lt('event_date', today)
@@ -273,7 +277,7 @@ function _renderNudgeCard(ev) {
   const yesterday = _daysAgo(1);
   const when = ev.event_date === yesterday ? 'yesterday' : ev.event_date;
   msg.textContent = ev.sport === 'football'
-    ? 'Barça vs ' + (ev.opponent || '?') + ' ' + when + ' — enter result'
+    ? selfTeamLabel(ev) + ' vs ' + (ev.opponent || '?').toUpperCase() + ' ' + when + ' — enter result'
     : (ev.gp_name || 'F1') + ' ' + when + ' — enter result';
   card.appendChild(msg);
 

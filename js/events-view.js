@@ -3,6 +3,10 @@ var DEBUG = false;
 var _eventsViewEl = null;
 var _eventsViewUserId = null;
 
+function selfTeamLabel(event) {
+  return (event.self_team || 'BARÇA').toUpperCase();
+}
+
 async function openEventsView() {
   try {
     const session = await supabase.auth.getSession();
@@ -98,7 +102,7 @@ function _renderEventRow(ev) {
   const title = document.createElement('p');
   title.className = 'event-row-title';
   title.textContent = ev.sport === 'football'
-    ? 'Barça vs ' + (ev.opponent || '—')
+    ? selfTeamLabel(ev) + ' vs ' + (ev.opponent || '—').toUpperCase()
     : (ev.gp_name || '—');
   info.appendChild(title);
 
@@ -149,7 +153,7 @@ function _openEventOptionsSheet(ev) {
   const name = document.createElement('p');
   name.className = 'sheet-option-label';
   name.textContent = ev.sport === 'football'
-    ? 'Barça vs ' + (ev.opponent || '—')
+    ? selfTeamLabel(ev) + ' vs ' + (ev.opponent || '—').toUpperCase()
     : (ev.gp_name || 'F1 event');
   content.appendChild(name);
 
@@ -243,9 +247,11 @@ function _openFootballForm() {
   const form = document.createElement('div');
   form.className = 'sheet-form';
 
+  const teamInp = _makeFormInput(form, 'ev-team', 'Team', 'Barça, Spain, Argentina...', 50, 'text', '');
+
   const venueLabel = document.createElement('label');
   venueLabel.className = 'form-label';
-  venueLabel.textContent = 'Barça plays';
+  venueLabel.textContent = 'Venue';
   form.appendChild(venueLabel);
 
   const venueRow = document.createElement('div');
@@ -266,6 +272,63 @@ function _openFootballForm() {
   form.appendChild(venueRow);
 
   const opp = _makeFormInput(form, 'ev-opp', 'Opponent', 'Real Madrid', 100, 'text', '');
+
+  // Self-team picker: appears when both team and opponent are filled
+  var selectedSelfTeam = null;
+  const selfPickerWrap = document.createElement('div');
+  selfPickerWrap.style.display = 'none';
+
+  const selfPickerLabel = document.createElement('label');
+  selfPickerLabel.className = 'form-label';
+  selfPickerLabel.textContent = 'Qual é o teu lado?';
+  selfPickerWrap.appendChild(selfPickerLabel);
+
+  const selfPickerRow = document.createElement('div');
+  selfPickerRow.className = 'priority-group';
+
+  const selfPillSelf = document.createElement('button');
+  selfPillSelf.type = 'button';
+  selfPillSelf.className = 'priority-btn';
+  selfPillSelf.textContent = '';
+
+  const selfPillOpp = document.createElement('button');
+  selfPillOpp.type = 'button';
+  selfPillOpp.className = 'priority-btn';
+  selfPillOpp.textContent = '';
+
+  selfPillSelf.addEventListener('click', function() {
+    selectedSelfTeam = teamInp.value.trim() || null;
+    selfPillSelf.classList.add('priority-btn--active');
+    selfPillOpp.classList.remove('priority-btn--active');
+  });
+  selfPillOpp.addEventListener('click', function() {
+    selectedSelfTeam = opp.value.trim() || null;
+    selfPillOpp.classList.add('priority-btn--active');
+    selfPillSelf.classList.remove('priority-btn--active');
+  });
+
+  selfPickerRow.appendChild(selfPillSelf);
+  selfPickerRow.appendChild(selfPillOpp);
+  selfPickerWrap.appendChild(selfPickerRow);
+  form.appendChild(selfPickerWrap);
+
+  function _updateSelfPicker() {
+    const tVal = teamInp.value.trim();
+    const oVal = opp.value.trim();
+    if (tVal && oVal) {
+      selfPickerWrap.style.display = '';
+      selfPillSelf.textContent = tVal.toUpperCase();
+      selfPillOpp.textContent = oVal.toUpperCase();
+    } else {
+      selfPickerWrap.style.display = 'none';
+      selectedSelfTeam = null;
+      selfPillSelf.classList.remove('priority-btn--active');
+      selfPillOpp.classList.remove('priority-btn--active');
+    }
+  }
+  teamInp.addEventListener('input', _updateSelfPicker);
+  opp.addEventListener('input', _updateSelfPicker);
+
   const comp = _makeFormInput(form, 'ev-comp', 'Competition', 'LaLiga, UCL, Copa...', 50, 'text', '');
   const customLbl = _makeFormInput(form, 'ev-label', 'Custom label (optional)', 'El Clásico, Final...', 50, 'text', '');
   const dateInput = _makeFormInput(form, 'ev-date', 'Date', '', null, 'date', todayLocal());
@@ -276,8 +339,10 @@ function _openFootballForm() {
   btn.className = 'btn-primary';
   btn.textContent = 'Save';
   btn.addEventListener('click', async () => {
+    const team = teamInp.value.trim();
     const opponent = opp.value.trim();
     const competition = comp.value.trim();
+    if (!team) { toast('Team required', 'error'); return; }
     if (!opponent) { toast('Opponent required', 'error'); return; }
     if (!competition) { toast('Competition required', 'error'); return; }
     btn.disabled = true;
@@ -288,7 +353,8 @@ function _openFootballForm() {
       home_status: selectedVenue,
       opponent,
       competition,
-      custom_label: customLbl.value.trim() || null
+      custom_label: customLbl.value.trim() || null,
+      self_team: selectedSelfTeam || null
     });
     if (!ev) { btn.disabled = false; return; }
 

@@ -413,3 +413,27 @@ body.match-day .player-avatar {
   cursor: pointer;
 }
 .f1-team-option--active { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+/* ---- Phase 7: Carousel ---- */
+.match-widget-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.match-widget-carousel::-webkit-scrollbar { display: none; }
+.match-widget-carousel .match-widget--in-carousel {
+  flex: 0 0 92%;
+  scroll-snap-align: center;
+}
+.match-widget-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.match-widget-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border-subtle);
+  transition: background 160ms ease;
+}
+.match-widget-dot--active { background: #FFD166; }

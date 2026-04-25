@@ -18,10 +18,40 @@ async function initMatchWidget(userId) {
     const events = await fetchTodayEvents(_widgetUserId);
     if (!events || events.length === 0) return;
 
-    // Prefer the first unsettled event; fall back to last (most recent) settled one
-    const event = events.find(e => !e.settled) || events[events.length - 1];
+    if (events.length === 1) {
+      section.appendChild(_buildWidgetCard(events[0]));
+    } else {
+      const carousel = document.createElement('div');
+      carousel.className = 'match-widget-carousel';
+      events.forEach(ev => {
+        const card = _buildWidgetCard(ev);
+        card.classList.add('match-widget--in-carousel');
+        carousel.appendChild(card);
+      });
+      section.appendChild(carousel);
 
-    section.appendChild(_buildWidgetCard(event));
+      const dots = document.createElement('div');
+      dots.className = 'match-widget-dots';
+      events.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'match-widget-dot' + (i === 0 ? ' match-widget-dot--active' : '');
+        dots.appendChild(dot);
+      });
+      section.appendChild(dots);
+
+      const cards = Array.from(carousel.querySelectorAll('.match-widget-card'));
+      const dotEls = Array.from(dots.querySelectorAll('.match-widget-dot'));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            const idx = cards.indexOf(entry.target);
+            if (idx < 0) return;
+            dotEls.forEach((d, i) => d.classList.toggle('match-widget-dot--active', i === idx));
+          }
+        });
+      }, { root: carousel, threshold: [0.6] });
+      cards.forEach(c => obs.observe(c));
+    }
     if (window.lucide) lucide.createIcons();
   } catch (err) {
     if (DEBUG) console.error('initMatchWidget failed', err);

@@ -319,6 +319,8 @@ function _openFootballForm() {
       selfPickerWrap.style.display = '';
       selfPillSelf.textContent = tVal.toUpperCase();
       selfPillOpp.textContent = oVal.toUpperCase();
+      if (selfPillSelf.classList.contains('priority-btn--active')) selectedSelfTeam = tVal;
+      if (selfPillOpp.classList.contains('priority-btn--active')) selectedSelfTeam = oVal;
     } else {
       selfPickerWrap.style.display = 'none';
       selectedSelfTeam = null;

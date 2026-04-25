@@ -258,9 +258,11 @@ async function renderPastUnsettledNudges(userId) {
 }
 
 function _daysAgo(n) {
-  const d = new Date();
+  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Africa/Maputo' }));
   d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
 }
 
 function _renderNudgeCard(ev) {

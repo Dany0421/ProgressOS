@@ -528,10 +528,11 @@ function openSettleSheet(event, prediction) {
 
     openMatchDetail(event.id);
     if (typeof window._reloadMatchWidget === 'function') window._reloadMatchWidget();
-    if (typeof applyMatchDayTheme === 'function') {
-      const s = await supabase.auth.getSession();
-      const uid = s.data.session && s.data.session.user.id;
-      if (uid) applyMatchDayTheme(uid);
+    const _s = await supabase.auth.getSession();
+    const _uid = _s.data.session && _s.data.session.user.id;
+    if (_uid) {
+      if (typeof renderPastUnsettledNudges === 'function') renderPastUnsettledNudges(_uid);
+      if (typeof applyMatchDayTheme === 'function') applyMatchDayTheme(_uid);
     }
   });
   form.appendChild(btn);

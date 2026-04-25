@@ -5,7 +5,7 @@
 ---
 
 ## Last Updated
-2026-04-23
+2026-04-25
 
 ---
 
@@ -179,11 +179,26 @@
 - [x] `window._reloadMatchWidget` wired in `match-widget.js` — widget refreshes badge to SETTLED after settlement
 - [x] Fix: `overscroll-behavior: contain` + `-webkit-overflow-scrolling: touch` on `.match-view` — scroll was propagating to background page
 
-**Pending — start here next session: Phase 5 — Theme skin activation**
+**Phase 5 — Theme skin activation ✅ (phone-tested 2026-04-25)**
+- [x] `js/match-day.js` — `applyMatchDayTheme(userId)`, `removeMatchDayTheme()`, `getActiveMatchDayEvent(userId)`, `F1_PALETTES` map (10 teams), `FOOTBALL_PALETTE` (blaugrana)
+- [x] Theme fires on all 4 pages (index/tasks/habits/projects) — `match-day.js` + `match-day.css` added to tasks.html/habits.html/projects.html; call wired after auth resolves `_userId` in dashboard.js/tasks.js/habits.js/projects.js
+- [x] `body.match-day` CSS overrides: radial gradient bg, player card border+glow, XP bar gradient, heatmap cell colour, avatar gradient — all driven by `--match-primary/secondary/accent` CSS vars
+- [x] All-day activation: theme on while unsettled event exists today; off if all settled or no events
+
+**Phase 6 — F1 team picker in Profile ✅ (phone-tested 2026-04-25)**
+- [x] `js/profile.js` select extended to include `f1_team`
+- [x] `_renderF1TeamRow()` — "MY F1 TEAM" section below titles row; button shows current team or "None — tap to pick"
+- [x] `_openF1TeamPicker()` — bottom sheet with None + 10 team options; active team highlighted
+- [x] `_makeF1Option()` — calls `set_f1_team` RPC, updates `_profileState.profile.f1_team`, re-renders profile, re-applies theme immediately
+- [x] CSS: `.profile-f1-row`, `.profile-f1-pick`, `.f1-team-list`, `.f1-team-option`, `.f1-team-option--active`
+
+**Bug fixes this session:**
+- [x] Widget settled state: `fetchTodayEvents` now selects `event_results(...)` via join; widget shows score ("2 - 1") instead of "VS" when settled, F1 shows "P1 [name]"
+- [x] `settle_event` RPC: no longer throws if no predictions exist — settles with 0 XP instead (handles case where event created after kickoff)
+
+**Pending — start here next session: Phase 7 — Carousel**
 
 **Subsequent phases (each = phone-test gate + commit):**
-- Phase 5: theme skin activation (blaugrana body.match-day, F1 palette map)
-- Phase 6: F1 team picker in Profile
 - Phase 7: carousel for multiple same-day events (scroll-snap + dots)
 - Phase 8: nudges for past unsettled events (7-day window)
 - Phase 9: extend `check_achievements` RPC for `event_created` + `prediction_perfect` triggers
@@ -193,7 +208,7 @@
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phases 0–4 done + committed + pushed. Resume at Phase 5 — Theme skin activation (`js/match-day.js`, `body.match-day` class + CSS palette vars).
+Phase 11 — Match Day Vibe — mid-build. Phases 0–6 done + committed + pushed. Resume at Phase 7 — Carousel for multiple same-day events (scroll-snap + dots in `js/match-widget.js` + `css/match-day.css`).
 
 ---
 

@@ -12,7 +12,7 @@ async function openProfile() {
     const today = todayLocal();
     const [profRes, habitsRes, tasksRes, projectsRes, daysRes, achState, totalDefsRes] = await Promise.all([
       supabase.from('profiles')
-        .select('username, total_xp, current_level, tasks_xp, habits_xp, projects_xp, active_title, created_at')
+        .select('username, total_xp, current_level, tasks_xp, habits_xp, projects_xp, active_title, f1_team, created_at')
         .eq('id', userId).single(),
       supabase.from('habits').select('longest_streak, total_completions').eq('user_id', userId),
       supabase.from('tasks').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('completed', true),
@@ -87,6 +87,7 @@ function _renderProfileView() {
   view.appendChild(_renderHero());
   view.appendChild(_renderStatsGrid());
   view.appendChild(_renderTitlesRow());
+  view.appendChild(_renderF1TeamRow());
   view.appendChild(_renderAchievementsCta());
 
   document.body.appendChild(view);
@@ -389,6 +390,72 @@ function _renderAchievementsCta() {
   requestAnimationFrame(() => setTimeout(() => { fill.style.width = `${pct}%`; }, 30));
 
   return wrap;
+}
+
+// ---- F1 team picker ----
+
+const F1_TEAM_LABELS = {
+  ferrari: 'Ferrari', mercedes: 'Mercedes', mclaren: 'McLaren',
+  redbull: 'Red Bull', aston_martin: 'Aston Martin', alpine: 'Alpine',
+  williams: 'Williams', rb: 'RB', haas: 'Haas', kick_sauber: 'Kick Sauber'
+};
+
+function _renderF1TeamRow() {
+  const wrap = document.createElement('div');
+  wrap.className = 'profile-f1-row';
+
+  const h = document.createElement('h3');
+  h.className = 'profile-section-heading mono';
+  h.textContent = 'MY F1 TEAM';
+  wrap.appendChild(h);
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'profile-f1-pick';
+  const current = _profileState.profile.f1_team;
+  btn.textContent = current ? F1_TEAM_LABELS[current] : 'None — tap to pick';
+  btn.addEventListener('click', _openF1TeamPicker);
+  wrap.appendChild(btn);
+  return wrap;
+}
+
+function _openF1TeamPicker() {
+  const form = document.createElement('div');
+  form.className = 'sheet-form';
+  const list = document.createElement('div');
+  list.className = 'f1-team-list';
+  list.appendChild(_makeF1Option('None', null));
+  Object.keys(F1_TEAM_LABELS).forEach(key => {
+    list.appendChild(_makeF1Option(F1_TEAM_LABELS[key], key));
+  });
+  form.appendChild(list);
+  showBottomSheet(form, 'Pick F1 team');
+}
+
+function _makeF1Option(label, key) {
+  const active = (_profileState.profile.f1_team || null) === key;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'f1-team-option' + (active ? ' f1-team-option--active' : '');
+  b.textContent = label;
+  b.addEventListener('click', async () => {
+    try {
+      const { error } = await supabase.rpc('set_f1_team', {
+        p_user_id: _profileState.userId,
+        p_team: key
+      });
+      if (error) throw error;
+      _profileState.profile.f1_team = key;
+      hideBottomSheet();
+      toast(key ? 'F1 team: ' + label : 'F1 team cleared');
+      _renderProfileView();
+      if (typeof applyMatchDayTheme === 'function') applyMatchDayTheme(_profileState.userId);
+    } catch (err) {
+      if (DEBUG) console.error('set_f1_team failed', err);
+      toast('Could not save team', 'error');
+    }
+  });
+  return b;
 }
 
 function closeProfile() {

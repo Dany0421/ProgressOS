@@ -373,3 +373,31 @@ body.match-day .player-avatar {
   border: 1px solid var(--match-accent) !important;
   color: #fff !important;
 }
+
+/* ---- Phase 6: F1 team picker ---- */
+.profile-f1-row { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.profile-f1-pick {
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-align: left;
+  cursor: pointer;
+}
+.f1-team-list { display: flex; flex-direction: column; gap: 6px; }
+.f1-team-option {
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.f1-team-option--active { border-color: var(--accent-primary); color: var(--accent-primary); }

@@ -13,7 +13,7 @@
 
 **Phase**: Phase 11 — Match Day Vibe (mid-build — backend + Events list shipped, UI layers pending)
 
-**Current focus**: Match Day Vibe V1 — manual-entry Barça/F1 events, theme skin on event day, prediction mechanic with XP rewards. Backend + Events list view done and phone-tested (Phases 0 + 1 of the implementation plan). Next session picks up with Phase 2 — Match detail page (4-state slide-in with editable predictions form).
+**Current focus**: Match Day Vibe V1 — **COMPLETO**. Todas as fases 0–10 implementadas. Próxima feature a definir com Dany.
 
 **This session also shipped**: Change Username feature (Profile name tappable + pencil icon → bottom sheet → update + case-insensitive unique index on DB). Fully phone-tested and working.
 
@@ -196,19 +196,35 @@
 - [x] Widget settled state: `fetchTodayEvents` now selects `event_results(...)` via join; widget shows score ("2 - 1") instead of "VS" when settled, F1 shows "P1 [name]"
 - [x] `settle_event` RPC: no longer throws if no predictions exist — settles with 0 XP instead (handles case where event created after kickoff)
 
-**Pending — start here next session: Phase 7 — Carousel**
+**Phase 7 — Carousel ✅ (phone-tested 2026-04-25)**
+- [x] `initMatchWidget` — if >1 today events, renders scroll-snap carousel with `IntersectionObserver` dots
+- [x] CSS: `.match-widget-carousel`, `.match-widget--in-carousel`, `.match-widget-dots`, `.match-widget-dot--active`
+- [x] Fix: theme re-applies after settle — `applyMatchDayTheme` called in settle handler; picks next unsettled event's palette automatically
 
-**Subsequent phases (each = phone-test gate + commit):**
-- Phase 7: carousel for multiple same-day events (scroll-snap + dots)
-- Phase 8: nudges for past unsettled events (7-day window)
-- Phase 9: extend `check_achievements` RPC for `event_created` + `prediction_perfect` triggers
+**Phase 8 — Nudges ✅ (phone-tested 2026-04-25)**
+- [x] `renderPastUnsettledNudges(userId)` — fetches unsettled events from last 7 days, renders orange-border nudge cards above widget
+- [x] `match-nudge-slot` div added to `index.html` above `match-widget-section`
+- [x] Nudge tappable → opens `openMatchDetail`; disappears immediately after settle (called in settle handler)
+- [x] Called on dashboard init + after every settle
+
+**Phase 9 — Achievements ✅ (applied to DB via MCP 2026-04-25)**
+- [x] `check_achievements` RPC extended with 2 new trigger types:
+  - `event_created` → awards `pred-first` (common +25 XP) on first event ever
+  - `prediction_perfect` → awards `pred-clasico` (football + custom_label ilike '%cl%sico%'), `pred-perfect-podium` (F1 perfect), `pred-oracle` (10 perfects total)
+- [x] JS hooks already wired in `events-view.js` (event_created) and `match-detail.js` (prediction_perfect)
+- [x] `sql/achievements.sql` updated to mirror DB for fresh installs
+
+**Phase 10 — Next-up + Docs ✅ (2026-04-25)**
+- [x] `initMatchWidget` — empty-today path now: fetch upcoming, filter next 7 days, render `_renderNextUpCard` (TOMORROW / IN X DAYS) or "+ ADD EVENT" dashed button if nothing in 7 days
+- [x] CSS: `.match-nextup`, `.match-nextup-label`, `.match-nextup-title`, `.widget-empty-add`
+- [x] SESSION.md updated
 - Phase 10: next-up widget variant + README/SESSION docs update
 
 ---
 
 ## In Progress 🛠
 
-Phase 11 — Match Day Vibe — mid-build. Phases 0–6 done + committed + pushed. Resume at Phase 7 — Carousel for multiple same-day events (scroll-snap + dots in `js/match-widget.js` + `css/match-day.css`).
+**Phase 11 — Match Day Vibe ✅ COMPLETO.** Todas as 11 fases (0–10) implementadas, phone-testadas e committed. Próxima feature a definir.
 
 ---
 

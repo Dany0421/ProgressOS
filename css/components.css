@@ -452,6 +452,55 @@
   color: var(--accent-primary);
   flex-shrink: 0;
 }
+/* Avatar colour modifiers — level rewards */
+.player-avatar.avatar--indigo-violet {
+  background: linear-gradient(135deg, var(--avatar-indigo-from), var(--avatar-indigo-to));
+}
+.player-avatar.avatar--crimson-orange {
+  background: linear-gradient(135deg, var(--avatar-crimson-from), var(--avatar-crimson-to));
+}
+.player-avatar.avatar--purple-pink {
+  background: linear-gradient(135deg, var(--avatar-purple-from), var(--avatar-purple-to));
+}
+.player-avatar.avatar--rainbow {
+  background: linear-gradient(135deg, var(--avatar-rainbow-from), var(--avatar-rainbow-to));
+  animation: rainbow-shift 4s linear infinite;
+}
+@keyframes rainbow-shift {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Badge rings — wraps around avatar element */
+.avatar-badge-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.avatar-badge-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.avatar-badge-wrap--gold::after {
+  border: 2px solid #FFD166;
+  box-shadow: 0 0 6px #FFD16680;
+}
+.avatar-badge-wrap--diamond::after {
+  border: 2px solid #88CCFF;
+  box-shadow: 0 0 8px #88CCFF99;
+}
+.avatar-badge-wrap--glow::after {
+  border: 2px solid #B57BFF;
+  box-shadow: 0 0 12px #B57BFF, 0 0 24px #B57BFF60;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%, 100% { box-shadow: 0 0 12px #B57BFF, 0 0 24px #B57BFF60; }
+  50%       { box-shadow: 0 0 20px #B57BFF, 0 0 40px #B57BFF80; }
+}
+
 .player-info { flex: 1; min-width: 0; }
 .player-name  { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
 .player-level { font-size: 12px; font-weight: 600; color: var(--accent-primary); margin-top: 3px; }
@@ -1913,3 +1962,17 @@ body.bonus-glow {
 }
 .ach-sheet-xp { color: var(--xp-color); }
 .ach-sheet-title-tag { color: var(--rarity-legendary); }
+
+/* Dormant player card */
+.player-card--dormant .player-avatar {
+  filter: grayscale(1) brightness(0.5);
+}
+.player-card--dormant .xp-bar-fill {
+  filter: grayscale(1) brightness(0.6);
+}
+.player-dormant-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #EF4444;
+  margin: 0;
+}

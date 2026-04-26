@@ -83,7 +83,7 @@ function floatXP(element, amount) {
   el.addEventListener('animationend', () => el.remove(), { once: true });
 }
 
-function showLevelUp(newLevel) {
+function showLevelUp(newLevel, rewards = []) {
   const overlay = document.createElement('div');
   overlay.className = 'levelup-overlay';
   overlay.setAttribute('role', 'dialog');
@@ -130,6 +130,42 @@ function showLevelUp(newLevel) {
     overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
   });
   inner.appendChild(btn);
+
+  if (rewards && rewards.length > 0) {
+    const rewardsPanel = document.createElement('div');
+    rewardsPanel.className = 'levelup-rewards';
+    rewardsPanel.style.opacity = '0';
+    rewardsPanel.style.transform = 'translateY(16px)';
+
+    rewards.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'levelup-reward-row';
+
+      const icon = document.createElement('i');
+      if (r.type === 'title')        icon.setAttribute('data-lucide', 'tag');
+      else if (r.type === 'avatar_colour') icon.setAttribute('data-lucide', 'palette');
+      else if (r.type === 'badge')   icon.setAttribute('data-lucide', 'shield');
+      row.appendChild(icon);
+
+      const label = document.createElement('span');
+      label.className = 'levelup-reward-label mono';
+      if (r.type === 'title')        label.textContent = `TITLE UNLOCKED — ${r.name.toUpperCase()}`;
+      else if (r.type === 'avatar_colour') label.textContent = 'NEW AVATAR COLOUR UNLOCKED';
+      else if (r.type === 'badge')   label.textContent = `NEW BADGE — ${r.key.toUpperCase()}`;
+      row.appendChild(label);
+
+      rewardsPanel.appendChild(row);
+    });
+
+    inner.appendChild(rewardsPanel);
+    lucide.createIcons();
+
+    setTimeout(() => {
+      rewardsPanel.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      rewardsPanel.style.opacity = '1';
+      rewardsPanel.style.transform = 'translateY(0)';
+    }, 900);
+  }
 
   overlay.appendChild(inner);
   document.body.appendChild(overlay);

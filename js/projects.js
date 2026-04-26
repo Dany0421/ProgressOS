@@ -402,6 +402,8 @@ async function _stopTimer() {
       toast(`+${xpEarned} XP — ${_formatMinutes(durationMinutes)}`);
     }
 
+    if (typeof checkDailyChallenges === 'function') checkDailyChallenges(_userId).catch(() => {});
+
     if (typeof checkAchievements === 'function') {
       checkAchievements(_userId, {
         type: 'session_stop',
@@ -602,6 +604,8 @@ async function _completeMilestone(ms, rowEl, rightEl) {
 
     haptic([10, 30, 10]);
     toast('Milestone complete — +40 XP');
+
+    if (typeof checkDailyChallenges === 'function') checkDailyChallenges(_userId).catch(() => {});
 
     if (typeof checkAchievements === 'function') {
       checkAchievements(_userId, {

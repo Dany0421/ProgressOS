@@ -1,0 +1,61 @@
+/* Daily Challenge section */
+.challenge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.challenge-streak {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.challenge-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  margin-bottom: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.challenge-card--easy     { border-left-color: #4ADE80; }
+.challenge-card--hard     { border-left-color: var(--accent); }
+.challenge-card--legendary { border-left-color: #B57BFF; }
+
+.challenge-card--done {
+  opacity: 0.5;
+}
+
+.challenge-tier {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.challenge-card--easy     .challenge-tier { color: #4ADE80; }
+.challenge-card--hard     .challenge-tier { color: var(--accent); }
+.challenge-card--legendary .challenge-tier { color: #B57BFF; }
+
+.challenge-desc {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.challenge-xp {
+  font-size: 12px;
+  color: var(--text-secondary);
+  align-self: flex-end;
+  margin: 0;
+}
+
+.challenge-card--done .challenge-xp {
+  color: #4ADE80;
+}

@@ -34,7 +34,8 @@ async function awardXP(userId, amount, category, description) {
 
     if (data.leveled_up) {
       playLevelUpChime();
-      showLevelUp(data.new_level);
+      const rewards = await checkLevelRewards(userId, data.new_level);
+      showLevelUp(data.new_level, rewards);
     }
 
     if (category !== 'achievement' && typeof checkAchievements === 'function') {
@@ -47,6 +48,35 @@ async function awardXP(userId, amount, category, description) {
     toast('Could not award XP', 'error');
     return null;
   }
+}
+
+async function checkLevelRewards(userId, newLevel) {
+  try {
+    const { data, error } = await supabase.rpc('check_level_rewards', {
+      p_user_id: userId,
+      p_new_level: newLevel
+    });
+    if (error) throw error;
+    return data.unlocked || [];
+  } catch (err) {
+    if (DEBUG) console.error('checkLevelRewards failed', err);
+    return [];
+  }
+}
+
+function levelAvatarColour(level) {
+  if (level >= 300) return 'rainbow';
+  if (level >= 100) return 'purple-pink';
+  if (level >= 40)  return 'crimson-orange';
+  if (level >= 20)  return 'indigo-violet';
+  return null;
+}
+
+function levelBadge(level) {
+  if (level >= 200) return 'glow';
+  if (level >= 100) return 'diamond';
+  if (level >= 50)  return 'gold';
+  return null;
 }
 
 async function _triggerAchievementChecks(userId, amount, category, data) {

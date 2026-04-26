@@ -63,6 +63,16 @@
   --transition-fast: 150ms ease;
   --transition-med:  300ms ease;
   --transition-slow: 600ms ease-out;
+
+  /* Level reward avatar palettes */
+  --avatar-indigo-from:  #4C1D95;
+  --avatar-indigo-to:    #7C3AED;
+  --avatar-crimson-from: #7F1D1D;
+  --avatar-crimson-to:   #EA580C;
+  --avatar-purple-from:  #581C87;
+  --avatar-purple-to:    #EC4899;
+  --avatar-rainbow-from: #EC4899;
+  --avatar-rainbow-to:   #06B6D4;
 }
 
 /* ============================================================

@@ -302,3 +302,38 @@
   .ach-legendary-badge--pulse,
   .ach-legendary-overlay::before { animation: none; }
 }
+
+/* Level-up rewards panel */
+.levelup-rewards {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.levelup-reward-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.levelup-reward-label {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* Welcome Back overlay */
+.welcome-back-card {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.welcome-back-bonus {
+  font-size: 11px;
+  color: #F59E0B;
+  letter-spacing: 0.06em;
+  margin: 8px 0 4px;
+  text-align: center;
+}

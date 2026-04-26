@@ -12,6 +12,7 @@ async function checkSession() {
     if (typeof checkPendingCelebration === 'function') {
       checkPendingCelebration(session.user.id);
     }
+    _updateLastSeen(session.user.id); // fire-and-forget
     return session;
   } catch (err) {
     if (DEBUG) console.error('checkSession failed', err);
@@ -60,6 +61,16 @@ async function checkAndGrantFreeze(userId) {
     }
   } catch (err) {
     if (DEBUG) console.error('checkAndGrantFreeze failed', err);
+  }
+}
+
+async function _updateLastSeen(userId) {
+  try {
+    await supabase.from('profiles')
+      .update({ last_seen_date: todayLocal() })
+      .eq('id', userId);
+  } catch (err) {
+    if (DEBUG) console.error('_updateLastSeen failed', err);
   }
 }
 

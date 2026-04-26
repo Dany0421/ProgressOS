@@ -117,6 +117,15 @@ on conflict (id) do update set
   hidden      = excluded.hidden,
   icon        = excluded.icon;
 
+-- Challenge streak + legendary badges
+insert into achievements (id, name, description, category, rarity, xp_reward, is_title, hidden, icon) values
+  ('chal-streak-7',   'On A Roll',     'Complete a daily challenge 7 days in a row.',   'volume', 'common',    50,  false, false, 'flame'),
+  ('chal-streak-30',  'Unstoppable',   'Complete a daily challenge 30 days in a row.',  'volume', 'rare',      150, false, false, 'zap'),
+  ('chal-streak-100', 'Iron Will',     'Complete a daily challenge 100 days in a row.', 'volume', 'legendary', 500, false, false, 'award'),
+  ('chal-legendary',  'Full Send',     'Complete a Legendary challenge.',               'rare',   'rare',      100, false, false, 'star'),
+  ('chal-legend-7',   'The Committed', 'Complete 7 Legendary challenges.',              'rare',   'rare',      100, false, false, 'stars')
+on conflict (id) do update set name = excluded.name, description = excluded.description;
+
 -- ============================================================
 -- 7. set_active_title — guarded RPC
 -- ============================================================

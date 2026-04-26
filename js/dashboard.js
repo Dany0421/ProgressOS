@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     _renderPlayerCard();
     _renderStats();
     initMatchWidget(_userId);
+    if (typeof initDailyChallenges === 'function') initDailyChallenges(_userId);
     if (typeof renderPastUnsettledNudges === 'function') renderPastUnsettledNudges(_userId);
     if (typeof applyMatchDayTheme === 'function') applyMatchDayTheme(_userId);
     _renderHeatmap();
@@ -39,7 +40,7 @@ async function _loadAll() {
   const thirtyDaysAgo = _daysAgo(29);
 
   const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes] = await Promise.all([
-    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title').eq('id', _userId).single(),
+    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title, challenge_streak').eq('id', _userId).single(),
     supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('completed', true).eq('due_date', today),
     supabase.from('habits').select('*', { count: 'exact', head: true }).eq('user_id', _userId).gt('current_streak', 0),
     supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('status', 'active'),

@@ -32,6 +32,12 @@ Four tabs, one bottom nav, everything runs on the phone.
 
 **Beta Player** — The first 10 people to sign up receive a permanent **Beta Player** legendary title (+250 XP). No action needed — it's awarded automatically on sign-up.
 
+**Daily Challenge** — Every day the app generates 3 missions calibrated to your actual data: Easy (complete 1 task or habit), Hard (complete 3 tasks or all today's habits), and Legendary (3 tasks + all habits + 30 min on a project). Legendary is suppressed on match days so you're not overwhelmed. Completing a challenge awards XP (50 / 150 / 300) and extends your **challenge streak** — consecutive days count. Challenges are auto-checked after every action and re-render silently without any tap required.
+
+**Level Rewards** — Hit milestone levels and unlock visible cosmetics. Titles (displayed under your name on the player card and profile) unlock at levels 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, and 500. Avatar colour gradients (indigo-violet at 20, crimson-orange at 40, purple-pink at 100, animated rainbow at 300) and XP-bar badge rings (gold at 50, diamond at 100, glow at 200) are applied automatically — no action needed, they derive from `current_level` client-side.
+
+**Dormancy / Comeback** — If you've been away for 5+ days, the dashboard enters Dormant state: player card goes greyscale with a red DORMANT label. On return a welcome-back overlay shows how many days you were gone and flags that your **first challenge completion awards 2× XP**. Once you collect it the bonus clears and the card snaps back to full colour. No XP decay, no punishment — just a visible nudge and a reward for coming back.
+
 **Match Day Vibe** — Track football matches and F1 races alongside your productivity. Create an event (kickoff time, opponent, competition), make predictions before the match locks, and settle the result after. Every correct field earns XP — score, winner, first scorer, name — and a perfect prediction stacks them all. F1 has P1 / P2 / P3 / fastest lap + a perfect-podium bonus.
 
 Supports any team — type "Spain", "Argentina", "Barça" — and optionally pick your side before saving the event. If your team wins and you called it, you get a +15 XP win bonus on top of your prediction XP.
@@ -64,6 +70,10 @@ The dashboard shows a **match widget**: UPCOMING badge before kickoff, LIVE time
 | F1 prediction: fastest lap | +25 |
 | F1 prediction: perfect podium bonus | +30 |
 | Win bonus (side chosen + team won) | +15 |
+| Daily challenge — Easy | +50 |
+| Daily challenge — Hard | +150 |
+| Daily challenge — Legendary | +300 |
+| Comeback bonus (first challenge after 5-day gap) | ×2 multiplier |
 
 **Daily cap on tasks**: 250 XP per day. If a task would cross the cap, it gets partial XP; further tasks in the same day award 0 XP. Habits, project milestones, project completion bonuses, prediction XP, win bonus, and achievement rewards are all exempt from the cap so rare events always feel rewarding.
 
@@ -105,25 +115,29 @@ ProgressOS/
 ├── projects.html       # Projects page
 ├── login.html          # Auth entry (login / sign up / reset password)
 ├── sql/
-│   ├── schema.sql      # Tables, indexes, RLS, award_xp RPC
-│   ├── functions.sql   # Freeze RPCs (consume_freeze, purchase_freeze)
-│   ├── achievements.sql# Achievements table, 40 seed rows, check/backfill RPCs
-│   └── match-day.sql   # Events/predictions/results tables, settle_event RPC
+│   ├── schema.sql          # Tables, indexes, RLS, award_xp RPC
+│   ├── functions.sql       # Freeze RPCs (consume_freeze, purchase_freeze)
+│   ├── achievements.sql    # Achievements table, 45 seed rows, check/backfill RPCs
+│   ├── match-day.sql       # Events/predictions/results tables, settle_event RPC
+│   ├── level-rewards.sql   # check_level_rewards RPC, 13 title seed rows
+│   └── daily-challenges.sql# daily_challenges table, generate/complete/get RPCs
 ├── css/
-│   ├── base.css        # Design tokens, resets
-│   ├── components.css  # Shared UI components
-│   ├── animations.css  # Motion + transitions
-│   └── match-day.css   # Match widget, match detail, theme skin overrides
+│   ├── base.css            # Design tokens, resets, avatar palette vars
+│   ├── components.css      # Shared UI components, avatar colour/badge classes
+│   ├── animations.css      # Motion + transitions, level-up rewards panel
+│   ├── match-day.css       # Match widget, match detail, theme skin overrides
+│   └── daily-challenge.css # Challenge cards, tier colours, done state
 ├── js/
 │   ├── supabase.js, auth.js, time.js
 │   ├── xp.js, freezes.js, ui.js, sound.js
 │   ├── tasks.js, habits.js, projects.js, dashboard.js
 │   ├── achievements.js, profile.js, achievements-gallery.js
-│   ├── events.js       # Event CRUD + prediction/settle helpers
-│   ├── events-view.js  # Events list + event creation forms
-│   ├── match-detail.js # Match detail page + prediction UI + settle sheet
-│   ├── match-widget.js # Dashboard widget card + carousel + nudges
-│   └── match-day.js    # Theme activation, F1/football palettes
+│   ├── daily-challenge.js  # Challenge init, condition checks, render
+│   ├── events.js           # Event CRUD + prediction/settle helpers
+│   ├── events-view.js      # Events list + event creation forms
+│   ├── match-detail.js     # Match detail page + prediction UI + settle sheet
+│   ├── match-widget.js     # Dashboard widget card + carousel + nudges
+│   └── match-day.js        # Theme activation, F1/football palettes
 ├── VISION.md           # Product spec (the source of truth)
 ├── CLAUDE.md           # Working rules for Claude Code sessions
 ├── SESSION.md          # Current build state, roadmap, open questions
@@ -146,8 +160,10 @@ Supabase dashboard → SQL Editor, run each file in order:
 
 1. [`sql/schema.sql`](./sql/schema.sql) — all tables, indexes, RLS policies, `award_xp` RPC
 2. [`sql/functions.sql`](./sql/functions.sql) — freeze RPCs (`consume_freeze`, `purchase_freeze`)
-3. [`sql/achievements.sql`](./sql/achievements.sql) — achievements schema, 40 seed rows, `check_achievements` / `backfill_achievements` / `set_active_title` / `mark_achievements_seen` RPCs
+3. [`sql/achievements.sql`](./sql/achievements.sql) — achievements schema, 45 seed rows, `check_achievements` / `backfill_achievements` / `set_active_title` / `mark_achievements_seen` RPCs
 4. [`sql/match-day.sql`](./sql/match-day.sql) — events / predictions / results tables, `settle_event` RPC, `_maputo_today()` utility
+5. [`sql/level-rewards.sql`](./sql/level-rewards.sql) — `check_level_rewards` RPC, 13 level-title seed rows
+6. [`sql/daily-challenges.sql`](./sql/daily-challenges.sql) — `daily_challenges` table, `generate_daily_challenges` / `complete_challenge` / `get_today_challenges` RPCs
 
 ### 3. Configure auth URLs
 

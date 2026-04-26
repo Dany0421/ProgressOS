@@ -239,10 +239,10 @@
 
 ## In Progress 🛠
 
-**V2 Big Three — branch `v2-big-three`, implemented, needs phone test before merge.**
+**V2 Big Three — MERGED + PUSHED to main. Needs thorough phone testing (only superficially tested so far).**
 
-### Level Rewards ✅ (implemented, not phone-tested)
-- `sql/level-rewards.sql` applied — 13 level title achievement rows, `check_level_rewards` RPC
+### Level Rewards ✅ (merged, needs full phone test)
+- `sql/level-rewards.sql` — 13 level title achievement rows, `check_level_rewards` RPC
 - `js/xp.js` — `checkLevelRewards()`, `levelAvatarColour()`, `levelBadge()` added; `awardXP` calls them on level-up
 - `js/ui.js` — `showLevelUp(newLevel, rewards=[])` shows rewards panel after XP bar
 - `js/dashboard.js` + `js/profile.js` — avatar colour class + badge wrap applied by level
@@ -250,8 +250,8 @@
 
 **To test:** Set `current_level = 50` in DB → reload → player card should have gold badge ring. Set to 100 → diamond. Level-up overlay should show rewards panel.
 
-### Daily Challenge ✅ (implemented, not phone-tested)
-- `sql/daily-challenges.sql` applied — table, RLS, profile columns, 3 RPCs
+### Daily Challenge ✅ (merged, needs full phone test)
+- `sql/daily-challenges.sql` — table, RLS, profile columns, 3 RPCs
 - `js/daily-challenge.js` — `initDailyChallenges`, `checkDailyChallenges`, `_dcConditionMet`, `_dcComplete`, `_dcRender`
 - `css/daily-challenge.css` — Easy (green) / Hard (lime) / Legendary (purple) cards
 - `index.html` — challenge-section between match widget and heatmap
@@ -259,9 +259,9 @@
 - **Bug fixed in review:** `habit_logs` column is `completed_date`, not `log_date`
 - **Bug fixed in review:** legendary combo `target_value` now stores `v_habits_today` (not hardcoded 3)
 
-**To test:** Open dashboard → 3 challenge cards appear. Complete a task → Easy auto-completes with toast + XP float.
+**To test:** Open dashboard → 3 challenge cards appear. Complete a task → Easy auto-completes with toast + XP float. Check challenge streak increments.
 
-### Dormancy/Comeback ✅ (implemented, not phone-tested)
+### Dormancy/Comeback ✅ (merged, needs full phone test)
 - `js/auth.js` — `_updateLastSeen` fire-and-forget on every `checkSession`
 - `js/dashboard.js` — `_checkDormancy()`, `_showWelcomeBack()`, dormant player card visual
 - `css/components.css` — dormant grayscale avatar; `css/animations.css` — amber welcome-back overlay
@@ -272,8 +272,7 @@
 
 ## Open Questions ❓
 
-- Phone test results for V2 Big Three (Dany needs to test)
-- Merge `v2-big-three` → `main` once phone-tested
+- Full phone test for V2 Big Three (merged to main but only superficially tested — Level Rewards, Daily Challenge, Dormancy/Comeback all need validation)
 
 ---
 

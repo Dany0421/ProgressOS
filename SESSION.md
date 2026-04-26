@@ -11,15 +11,13 @@
 
 ## Project Status
 
-**Phase**: V2 Big Three **IMPLEMENTED — needs phone test**
+**Phase**: V2 Big Three **MERGED + PUSHED TO MAIN — needs phone test**
 
-**Branch**: `v2-big-three` (not yet merged to main)
+**Current focus**: Phone test Level Rewards + Daily Challenge + Dormancy/Comeback.
 
-**Current focus**: Phone test the 3 new features, then merge.
-
-**Plan/spec location** (both gitignored per Dany's preference):
-- Spec: `docs/specs/2026-04-22-match-day-vibe-design.md`
-- Impl plan: `docs/superpowers/plans/2026-04-22-match-day-vibe.md`
+**Plan/spec location** (gitignored):
+- Spec: `docs/specs/2026-04-26-v2-big-three-design.md`
+- Plans: `docs/superpowers/plans/2026-04-26-level-rewards.md`, `2026-04-26-daily-challenge.md`, `2026-04-26-dormancy-comeback.md`
 
 ---
 

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     await _loadAll();
+    _checkDormancy();
     _renderPlayerCard();
     _renderStats();
     initMatchWidget(_userId);
@@ -27,6 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     _renderFeed();
     _wireFAB();
     _checkOnboarding();
+    if (window._isDormant) {
+      setTimeout(() => _showWelcomeBack(), 1000);
+    }
   } catch (err) {
     if (DEBUG) console.error('dashboard init', err);
     toast('Could not load dashboard', 'error');
@@ -40,7 +44,7 @@ async function _loadAll() {
   const thirtyDaysAgo = _daysAgo(29);
 
   const [profileRes, tasksDoneRes, streaksRes, projectsRes, xpRes, focusRes] = await Promise.all([
-    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title, challenge_streak').eq('id', _userId).single(),
+    supabase.from('profiles').select('username, total_xp, current_level, created_at, onboarding_completed, active_title, challenge_streak, last_seen_date').eq('id', _userId).single(),
     supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('completed', true).eq('due_date', today),
     supabase.from('habits').select('*', { count: 'exact', head: true }).eq('user_id', _userId).gt('current_streak', 0),
     supabase.from('projects').select('*', { count: 'exact', head: true }).eq('user_id', _userId).eq('status', 'active'),
@@ -70,6 +74,18 @@ async function _loadAll() {
   _focusTasks = (focusRes.data || [])
     .sort((a, b) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1))
     .slice(0, 3);
+}
+
+function _checkDormancy() {
+  const lastSeen = _profile.last_seen_date;
+  if (!lastSeen) return;
+  const daysSince = daysBetween(lastSeen, todayLocal());
+  if (daysSince >= 5) {
+    window._isDormant = true;
+    window._comebackBonus = true;
+  } else {
+    window._isDormant = false;
+  }
 }
 
 function _daysAgo(n) {
@@ -106,7 +122,7 @@ function _renderPlayerCard() {
   const el = document.getElementById('player-card');
   if (!el) return;
   el.textContent = '';
-  el.className = 'player-card';
+  el.className = 'player-card' + (window._isDormant ? ' player-card--dormant' : '');
 
   const level = _profile.current_level || 1;
   const totalXP = _profile.total_xp || 0;
@@ -146,6 +162,13 @@ function _renderPlayerCard() {
   lvl.className = 'player-level mono';
   lvl.textContent = `LVL ${level}`;
   info.appendChild(lvl);
+
+  if (window._isDormant) {
+    const dormantLabel = document.createElement('p');
+    dormantLabel.className = 'player-dormant-label mono';
+    dormantLabel.textContent = 'DORMANT';
+    info.appendChild(dormantLabel);
+  }
 
   const gear = document.createElement('button');
   gear.className = 'icon-btn';
@@ -629,6 +652,53 @@ function _checkOnboarding() {
   if (_profile.onboarding_completed === false) {
     _showOnboardingModal();
   }
+}
+
+function _showWelcomeBack() {
+  const lastSeen = _profile.last_seen_date;
+  if (!lastSeen) return;
+  const daysSince = daysBetween(lastSeen, todayLocal());
+
+  const overlay = document.createElement('div');
+  overlay.className = 'onboarding-overlay';
+
+  const card = document.createElement('div');
+  card.className = 'onboarding-card welcome-back-card';
+
+  const heading = document.createElement('h1');
+  heading.className = 'onboarding-title';
+  heading.textContent = 'Welcome back.';
+  card.appendChild(heading);
+
+  const sub = document.createElement('p');
+  sub.className = 'onboarding-pillar-body';
+  sub.textContent = 'You were away for ' + daysSince + ' day' + (daysSince !== 1 ? 's' : '') + '. Time to get back in the game.';
+  card.appendChild(sub);
+
+  const bonus = document.createElement('p');
+  bonus.className = 'welcome-back-bonus mono';
+  bonus.textContent = '× 2 XP ON YOUR FIRST CHALLENGE';
+  card.appendChild(bonus);
+
+  const btn = document.createElement('button');
+  btn.className = 'btn-primary';
+  btn.textContent = "LET'S GO";
+  btn.addEventListener('click', () => {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.remove();
+      window._isDormant = false;
+      _renderPlayerCard();
+    }, 400);
+    haptic(15);
+  });
+  card.appendChild(btn);
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  lucide.createIcons();
+
+  requestAnimationFrame(() => setTimeout(() => overlay.classList.add('onboarding-overlay--visible'), 30));
 }
 
 function _showOnboardingModal() {

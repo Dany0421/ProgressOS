@@ -1962,3 +1962,17 @@ body.bonus-glow {
 }
 .ach-sheet-xp { color: var(--xp-color); }
 .ach-sheet-title-tag { color: var(--rarity-legendary); }
+
+/* Dormant player card */
+.player-card--dormant .player-avatar {
+  filter: grayscale(1) brightness(0.5);
+}
+.player-card--dormant .xp-bar-fill {
+  filter: grayscale(1) brightness(0.6);
+}
+.player-dormant-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #EF4444;
+  margin: 0;
+}

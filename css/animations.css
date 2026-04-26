@@ -325,3 +325,15 @@
   color: var(--accent);
   letter-spacing: 0.04em;
 }
+
+/* Welcome Back overlay */
+.welcome-back-card {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.welcome-back-bonus {
+  font-size: 11px;
+  color: #F59E0B;
+  letter-spacing: 0.06em;
+  margin: 8px 0 4px;
+  text-align: center;
+}

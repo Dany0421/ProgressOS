@@ -5,17 +5,17 @@
 ---
 
 ## Last Updated
-2026-04-25 (Phase 11 multi-team)
+2026-04-26 (V2 Big Three — Level Rewards + Daily Challenge + Dormancy)
 
 ---
 
 ## Project Status
 
-**Phase**: Phase 11 — Multi-Team Football Support **COMPLETO**
+**Phase**: V2 Big Three **IMPLEMENTED — needs phone test**
 
-**Current focus**: Multi-team done. Próxima feature a definir com Dany.
+**Branch**: `v2-big-three` (not yet merged to main)
 
-**This session also shipped**: Change Username feature (Profile name tappable + pencil icon → bottom sheet → update + case-insensitive unique index on DB). Fully phone-tested and working.
+**Current focus**: Phone test the 3 new features, then merge.
 
 **Plan/spec location** (both gitignored per Dany's preference):
 - Spec: `docs/specs/2026-04-22-match-day-vibe-design.md`
@@ -241,13 +241,41 @@
 
 ## In Progress 🛠
 
-Nada. Próxima feature a definir com Dany.
+**V2 Big Three — branch `v2-big-three`, implemented, needs phone test before merge.**
+
+### Level Rewards ✅ (implemented, not phone-tested)
+- `sql/level-rewards.sql` applied — 13 level title achievement rows, `check_level_rewards` RPC
+- `js/xp.js` — `checkLevelRewards()`, `levelAvatarColour()`, `levelBadge()` added; `awardXP` calls them on level-up
+- `js/ui.js` — `showLevelUp(newLevel, rewards=[])` shows rewards panel after XP bar
+- `js/dashboard.js` + `js/profile.js` — avatar colour class + badge wrap applied by level
+- `css/base.css` — avatar palette vars; `css/components.css` — badge ring CSS
+
+**To test:** Set `current_level = 50` in DB → reload → player card should have gold badge ring. Set to 100 → diamond. Level-up overlay should show rewards panel.
+
+### Daily Challenge ✅ (implemented, not phone-tested)
+- `sql/daily-challenges.sql` applied — table, RLS, profile columns, 3 RPCs
+- `js/daily-challenge.js` — `initDailyChallenges`, `checkDailyChallenges`, `_dcConditionMet`, `_dcComplete`, `_dcRender`
+- `css/daily-challenge.css` — Easy (green) / Hard (lime) / Legendary (purple) cards
+- `index.html` — challenge-section between match widget and heatmap
+- `js/tasks.js`, `js/habits.js`, `js/projects.js` — fire-and-forget `checkDailyChallenges` after completions
+- **Bug fixed in review:** `habit_logs` column is `completed_date`, not `log_date`
+- **Bug fixed in review:** legendary combo `target_value` now stores `v_habits_today` (not hardcoded 3)
+
+**To test:** Open dashboard → 3 challenge cards appear. Complete a task → Easy auto-completes with toast + XP float.
+
+### Dormancy/Comeback ✅ (implemented, not phone-tested)
+- `js/auth.js` — `_updateLastSeen` fire-and-forget on every `checkSession`
+- `js/dashboard.js` — `_checkDormancy()`, `_showWelcomeBack()`, dormant player card visual
+- `css/components.css` — dormant grayscale avatar; `css/animations.css` — amber welcome-back overlay
+
+**To test:** Set `last_seen_date = today - 6 days` in DB → reload → player card greyscale + DORMANT label → after 1s: amber welcome-back overlay. Complete any challenge → "+XP · COMEBACK ×2" toast.
 
 ---
 
 ## Open Questions ❓
 
-Nenhuma.
+- Phone test results for V2 Big Three (Dany needs to test)
+- Merge `v2-big-three` → `main` once phone-tested
 
 ---
 

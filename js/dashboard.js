@@ -123,6 +123,8 @@ function _renderPlayerCard() {
   avatar.className = 'player-avatar';
   const initials = (_profile.username || 'U').charAt(0).toUpperCase();
   avatar.textContent = initials;
+  const colour = levelAvatarColour(level);
+  if (colour) avatar.classList.add(`avatar--${colour}`);
 
   const info = document.createElement('div');
   info.className = 'player-info';
@@ -156,7 +158,15 @@ function _renderPlayerCard() {
     openSettings();
   });
 
-  topRow.appendChild(avatar);
+  const badge = levelBadge(level);
+  if (badge) {
+    const wrap = document.createElement('div');
+    wrap.className = `avatar-badge-wrap avatar-badge-wrap--${badge}`;
+    wrap.appendChild(avatar);
+    topRow.appendChild(wrap);
+  } else {
+    topRow.appendChild(avatar);
+  }
   topRow.appendChild(info);
   topRow.appendChild(gear);
   el.appendChild(topRow);

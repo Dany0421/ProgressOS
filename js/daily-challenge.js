@@ -83,7 +83,7 @@ async function _dcConditionMet(userId, challenge, today) {
         .from('habit_logs')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('log_date', today);
+        .eq('completed_date', today);
       return (count || 0) >= challenge.target_value;
     }
 
@@ -102,7 +102,7 @@ async function _dcConditionMet(userId, challenge, today) {
         supabase.from('tasks').select('id', { count: 'exact', head: true })
           .eq('user_id', userId).eq('completed', true).gte('completed_at', datePrefix),
         supabase.from('habit_logs').select('id', { count: 'exact', head: true })
-          .eq('user_id', userId).eq('log_date', today),
+          .eq('user_id', userId).eq('completed_date', today),
         supabase.from('project_sessions').select('duration_minutes')
           .eq('user_id', userId).gte('started_at', datePrefix)
       ]);

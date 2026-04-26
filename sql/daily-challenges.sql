@@ -92,7 +92,7 @@ begin
   if not p_has_event_today then
     if v_tasks_pending >= 3 and v_habits_today >= 1 and v_projects_open >= 1 then
       insert into daily_challenges (user_id, challenge_date, tier, category, description, target_value)
-      values (p_user_id, p_date, 'legendary', 'combo', 'Complete 3 tasks + all habits + 30 min on a project.', 3) on conflict do nothing;
+      values (p_user_id, p_date, 'legendary', 'combo', 'Complete 3 tasks + all habits + 30 min on a project.', v_habits_today) on conflict do nothing;
     elsif v_tasks_pending >= 5 then
       insert into daily_challenges (user_id, challenge_date, tier, category, description, target_value)
       values (p_user_id, p_date, 'legendary', 'tasks', 'Complete 5 tasks today.', 5) on conflict do nothing;

@@ -308,6 +308,8 @@ async function _completeHabit(habit, cardEl, toggleEl, rightEl) {
     const result = await awardXP(_userId, 15, 'habits', `Habit: ${habit.title}`);
     if (result && result.awarded > 0) floatXP(toggleEl, result.awarded);
 
+    if (typeof checkDailyChallenges === 'function') checkDailyChallenges(_userId).catch(() => {});
+
     await _checkMilestone(habit, newStreak);
 
     if (typeof checkAchievements === 'function') {

@@ -104,9 +104,21 @@ function _renderHero() {
   hero.className = 'profile-hero';
 
   const avatar = document.createElement('div');
-  avatar.className = 'profile-avatar--lg';
+  avatar.className = 'player-avatar profile-avatar--lg';
   avatar.textContent = (profile.username || 'U').charAt(0).toUpperCase();
-  hero.appendChild(avatar);
+
+  const colour = levelAvatarColour(profile.current_level || 1);
+  if (colour) avatar.classList.add(`avatar--${colour}`);
+
+  const badge = levelBadge(profile.current_level || 1);
+  if (badge) {
+    const wrap = document.createElement('div');
+    wrap.className = `avatar-badge-wrap avatar-badge-wrap--${badge}`;
+    wrap.appendChild(avatar);
+    hero.appendChild(wrap);
+  } else {
+    hero.appendChild(avatar);
+  }
 
   const nameRow = document.createElement('div');
   nameRow.className = 'profile-name-row';

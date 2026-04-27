@@ -432,6 +432,10 @@ async function _completeFocusTask(task, rowEl) {
       if (valEl) valEl.textContent = _stats.tasksDone;
     }
 
+    if (typeof checkDailyChallenges === 'function') {
+      checkDailyChallenges(_userId).then(() => _reloadFeed()).catch(() => {});
+    }
+
   } catch (err) {
     if (DEBUG) console.error('completeFocusTask failed', err);
     if (checkEl) checkEl.disabled = false;
@@ -440,6 +444,22 @@ async function _completeFocusTask(task, rowEl) {
 }
 
 // ---- XP Feed ----
+
+async function _reloadFeed() {
+  try {
+    const thirtyDaysAgo = _daysAgo(29);
+    const { data } = await supabase
+      .from('xp_events')
+      .select('event_date, xp_amount, category, description, created_at')
+      .eq('user_id', _userId)
+      .gte('event_date', thirtyDaysAgo)
+      .order('created_at', { ascending: false });
+    _xpEvents = data || [];
+    _renderFeed();
+  } catch (err) {
+    if (DEBUG) console.error('_reloadFeed failed', err);
+  }
+}
 
 function _renderFeed() {
   const section = document.getElementById('feed-section');

@@ -166,7 +166,7 @@ begin
     where id = p_user_id;
 
   perform award_xp(p_user_id, v_final_xp, 'challenge',
-    'Challenge (' || v_tier || '): ' || v_desc);
+    'Challenge (' || v_tier || '): ' || v_desc, p_date);
 
   return jsonb_build_object(
     'awarded', v_final_xp,

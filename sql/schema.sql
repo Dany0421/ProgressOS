@@ -246,7 +246,7 @@ end; $$;
 -- Extend xp_events category check to allow 'prediction' (cap-exempt like 'achievement')
 alter table xp_events drop constraint if exists xp_events_category_check;
 alter table xp_events add constraint xp_events_category_check
-  check (category in ('tasks','habits','projects','bonus','system','spend','achievement','prediction'));
+  check (category in ('tasks','habits','projects','bonus','system','spend','achievement','prediction','challenge'));
 
 -- profiles: F1 team preference
 alter table profiles add column if not exists f1_team text;

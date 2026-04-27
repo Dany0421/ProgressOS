@@ -258,8 +258,10 @@
 - `js/tasks.js`, `js/habits.js`, `js/projects.js` — fire-and-forget `checkDailyChallenges` after completions
 - **Bug fixed in review:** `habit_logs` column is `completed_date`, not `log_date`
 - **Bug fixed in review:** legendary combo `target_value` now stores `v_habits_today` (not hardcoded 3)
+- **Bug fixed 2026-04-27:** `complete_challenge` RPC called `award_xp` with 4 params (missing `p_date`) and used category `'challenge'` which wasn't in `xp_events` check constraint → silent failure, no toast, no XP. Fixed: added `'challenge'` to constraint + passed `p_date` to `award_xp`.
+- **Bug fixed 2026-04-27:** `_completeFocusTask` in dashboard.js never called `checkDailyChallenges` — challenges couldn't complete from Today's Focus. Fixed + added `_reloadFeed()` so XP feed updates in-place after challenge completes.
 
-**To test:** Open dashboard → 3 challenge cards appear. Complete a task → Easy auto-completes with toast + XP float. Check challenge streak increments.
+**To test:** Open dashboard → 3 challenge cards appear. Complete a task from Today's Focus → challenge card auto-completes with toast + XP float + feed updates. Check challenge streak increments.
 
 ### Dormancy/Comeback ✅ (merged, needs full phone test)
 - `js/auth.js` — `_updateLastSeen` fire-and-forget on every `checkSession`

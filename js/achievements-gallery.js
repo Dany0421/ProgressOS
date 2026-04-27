@@ -188,6 +188,7 @@ function _makeCard(def, row, isUnlocked, isHiddenLocked) {
 function _openDetail(def, row, isUnlocked, isHiddenLocked) {
   _destroySheet();
   haptic(12);
+  if (_galleryViewEl) _galleryViewEl.style.overflow = 'hidden';
 
   const overlay = document.createElement('div');
   overlay.className = 'ach-sheet-overlay';
@@ -266,6 +267,7 @@ function _closeSheet() {
     if (el.parentNode) el.parentNode.removeChild(el);
   }, { once: true });
   _gallerySheetEl = null;
+  if (_galleryViewEl) _galleryViewEl.style.overflow = '';
 }
 
 function _destroySheet() {

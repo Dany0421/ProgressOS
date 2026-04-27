@@ -1901,6 +1901,10 @@ body.bonus-glow {
 .ach-sheet {
   width: 100%;
   max-width: 520px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-surface);
   border-top-left-radius: var(--radius-card);
   border-top-right-radius: var(--radius-card);

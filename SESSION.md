@@ -348,8 +348,3 @@
   CLAUDE.md
   SESSION.md
 ```
-
-**Supabase URL**: https://dhrgjtnsyzybjsfaftrm.supabase.co
-**Supabase anon key**: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmdqdG5zeXp5YmpzZmFmdHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTc5MTQsImV4cCI6MjA5MjI5MzkxNH0.wQ6vJ_KUVMt7CturBfVvLJ088WpX1f4pUPfsXlKi1LY
-**Lucide CDN version**: 0.460.0 (pinned — don't use @latest)
-**Test user email**: *paste when created*

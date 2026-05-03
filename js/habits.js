@@ -50,21 +50,47 @@ async function _checkStreaks() {
 
   for (const habit of _habits) {
     const activeDays = habit.active_days || [0,1,2,3,4,5,6];
-    if (!activeDays.includes(todayDow)) continue; // not scheduled today, skip
+    if (!activeDays.includes(todayDow)) continue;
 
     const last = habit.last_completed_date;
     if (!last || last === today) continue;
 
-    const prevDay = prevScheduledDate(activeDays);
-    if (!prevDay || last >= prevDay) continue; // completed on last scheduled day, fine
+    const missedDays = _missedScheduledDays(last, today, activeDays);
+    if (!missedDays.length) continue;
 
-    if (_profile.freezes_available > 0 && habit.current_streak >= 3) {
-      const ok = await consumeFreeze(_userId, habit, prevDay);
-      if (ok) _profile.freezes_available--;
-    } else {
+    if (habit.current_streak < 3) {
+      await _breakStreak(habit);
+      continue;
+    }
+
+    let frozeCount = 0;
+    for (const day of missedDays) {
+      if (_profile.freezes_available <= 0) break;
+      const ok = await consumeFreeze(_userId, habit, day);
+      if (!ok) break;
+      _profile.freezes_available--;
+      frozeCount++;
+    }
+
+    if (frozeCount < missedDays.length) {
       await _breakStreak(habit);
     }
   }
+}
+
+// Returns all scheduled dates strictly between lastDate and today (exclusive on both ends)
+function _missedScheduledDays(lastDate, today, activeDays) {
+  const missed = [];
+  const cursor = new Date(lastDate + 'T12:00:00');
+  const end = new Date(today + 'T12:00:00');
+  cursor.setDate(cursor.getDate() + 1);
+  while (cursor < end) {
+    const dateStr = cursor.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+    const dow = new Date(dateStr + 'T12:00:00').getDay();
+    if (activeDays.includes(dow)) missed.push(dateStr);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return missed;
 }
 
 async function _breakStreak(habit) {

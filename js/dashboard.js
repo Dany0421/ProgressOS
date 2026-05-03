@@ -77,7 +77,9 @@ async function _loadAll() {
 }
 
 function _checkDormancy() {
-  const lastSeen = _profile.last_seen_date;
+  // Use the pre-update value captured synchronously in _updateLastSeen (auth.js)
+  // _profile.last_seen_date races with the DB update — window._previousLastSeen is reliable
+  const lastSeen = window._previousLastSeen;
   if (!lastSeen) return;
   const daysSince = daysBetween(lastSeen, todayLocal());
   if (daysSince >= 5) {
@@ -675,7 +677,7 @@ function _checkOnboarding() {
 }
 
 function _showWelcomeBack() {
-  const lastSeen = _profile.last_seen_date;
+  const lastSeen = window._previousLastSeen;
   if (!lastSeen) return;
   const daysSince = daysBetween(lastSeen, todayLocal());
 

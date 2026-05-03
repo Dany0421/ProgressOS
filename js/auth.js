@@ -64,11 +64,17 @@ async function checkAndGrantFreeze(userId) {
   }
 }
 
-async function _updateLastSeen(userId) {
+function _updateLastSeen(userId) {
   try {
-    await supabase.from('profiles')
-      .update({ last_seen_date: todayLocal() })
-      .eq('id', userId);
+    const today = todayLocal();
+    // Read previous value synchronously before overwriting — used by _checkDormancy
+    window._previousLastSeen = localStorage.getItem('progress_os_last_seen') || null;
+    localStorage.setItem('progress_os_last_seen', today);
+    // Update DB fire-and-forget
+    supabase.from('profiles')
+      .update({ last_seen_date: today })
+      .eq('id', userId)
+      .then(() => {}).catch(() => {});
   } catch (err) {
     if (DEBUG) console.error('_updateLastSeen failed', err);
   }
